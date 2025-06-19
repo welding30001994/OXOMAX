@@ -1,197 +1,642 @@
 <!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>curso basico de trading</title>
+  
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Valores</title>
+    <title>Trading Academy Pro - Curso Básico</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Estilos -->
     <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #1e40af;
+            --accent: #3b82f6;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --success: #10b981;
+        }
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
+        
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background: url('https://raw.githubusercontent.com/welding30001994/as/refs/heads/main/10fef95f-f8d7-463e-855e-4d66ade7e0de.jpg') no-repeat center center fixed;
-            background-size: cover;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            padding: 20px;
+            background-color: #f1f5f9;
+            color: var(--dark);
+            line-height: 1.6;
         }
-
+        
         .container {
-            background: rgba(255, 255, 255, 0.8);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-            width: 90%;
-            max-width: 400px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
-
-        h2 {
-            margin-bottom: 15px;
-            font-size: 24px;
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-
-        .input-group {
+        
+        nav {
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
         }
-
-        label {
-            font-size: 18px;
+        
+        .logo {
+            font-size: 1.8rem;
             font-weight: bold;
-            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-
-        input {
-            padding: 10px;
-            width: 100%;
-            font-size: 16px;
-            border: 2px solid #007bff;
-            border-radius: 5px;
+        
+        .logo i {
+            color: var(--accent);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+        
+        .auth-buttons button {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .login-btn {
+            background: transparent;
+            border: 1px solid white;
+            color: white;
+            margin-right: 10px;
+        }
+        
+        .login-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .register-btn {
+            background: white;
+            border: 1px solid white;
+            color: var(--primary);
+        }
+        
+        .register-btn:hover {
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .hero {
+            padding: 5rem 0;
             text-align: center;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
         }
-
-        button {
-            padding: 12px 25px;
-            background-color: #007bff;
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+        
+        .cta-button {
+            padding: 12px 24px;
+            background-color: var(--accent);
             color: white;
             border: none;
+            border-radius: 4px;
+            font-size: 1.1rem;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 16px;
-            border-radius: 5px;
-            margin-top: 10px;
-            width: 100%;
+            transition: all 0.3s ease;
         }
-
-        button:hover {
-            background-color: #0056b3;
+        
+        .cta-button:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
         }
-
-        table {
-            width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        
+        .features {
+            padding: 4rem 0;
         }
-
-        th, td {
-            border: 1px solid black;
-            padding: 12px;
+        
+        .section-title {
             text-align: center;
-            font-size: 18px;
+            margin-bottom: 3rem;
         }
-
-        th {
-            background-color: #343a40;
+        
+        .section-title h2 {
+            font-size: 2.2rem;
+            color: var(--dark);
+        }
+        
+        .section-title p {
+            color: #64748b;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+        
+        footer {
+            background-color: var(--dark);
             color: white;
+            padding: 3rem 0;
+            text-align: center;
         }
-
-        td:nth-child(2) { 
-            background-color: rgba(255, 0, 0, 0.3); /* Rojo transparente para Sell */
+        
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
         }
-
-        td:nth-child(3) { 
-            background-color: rgba(0, 0, 255, 0.3); /* Azul transparente para Buy */
+        
+        .footer-logo {
+            font-size: 1.8rem;
+            font-weight: bold;
         }
-
-        /* Para pantallas pequeñas (móviles) */
-        @media (max-width: 600px) {
-            .container {
-                width: 100%;
-                max-width: 90%;
+        
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+        
+        .social-icons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-icons a {
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        .copyright {
+            margin-top: 2rem;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        
+        /* Modal de autenticación */
+        .auth-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .auth-container {
+            background-color: white;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+            padding: 2rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .auth-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .auth-header h2 {
+            color: var(--dark);
+        }
+        
+        .close-auth {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #64748b;
+        }
+        
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .auth-form input {
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .auth-form input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .auth-submit {
+            padding: 12px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .auth-submit:hover {
+            background-color: var(--secondary);
+        }
+        
+        .auth-toggle {
+            text-align: center;
+            margin-top: 1rem;
+            color: #64748b;
+        }
+        
+        .auth-toggle span {
+            color: var(--primary);
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .auth-error {
+            color: #ef4444;
+            font-size: 0.9rem;
+            margin-top: -0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
             }
-            h2 {
-                font-size: 20px;
+            
+            .hero h1 {
+                font-size: 2.2rem;
             }
-            input {
-                font-size: 14px;
-                padding: 8px;
-            }
-            button {
-                font-size: 14px;
-                padding: 10px;
-            }
-            th, td {
-                font-size: 16px;
-                padding: 10px;
+            
+            .hero p {
+                font-size: 1rem;
             }
         }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <h2>OXOMAX</h2>
-
-        <div class="input-group">
-            <label>Máximo:</label>
-            <input type="number" id="maximo" placeholder="Ingrese el máximo">
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <i class="fas fa-chart-line"></i>
+                    <span>OXOMAX-TRADING</span>
+                </div>
+                <div class="nav-links">
+                    <a href="#features">Beneficios</a>
+                    <a href="#about">Nosotros</a>
+                    <a href="#contact">Contacto</a>
+                </div>
+                <div class="auth-buttons">
+                    <button class="login-btn" id="openLogin">Iniciar Sesión</button>
+                    <button class="register-btn" id="openRegister">Registrarse</button>
+                </div>
+            </nav>
         </div>
+    </header>
 
-        <div class="input-group">
-            <label>Mínimo:</label>
-            <input type="number" id="minimo" placeholder="Ingrese el mínimo">
+    <section class="hero">
+        <div class="container">
+            <h1>Domina el Mercado con Nuestro Curso Básico de Trading</h1>
+            <p>Aprende las estrategias fundamentales para operar en los mercados financieros de la mano de expertos con años de experiencia.</p>
+            <button class="cta-button" id="heroCta">Empieza Ahora</button>
         </div>
+    </section>
 
-        <button onclick="calcularValores()">Calcular</button>
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Beneficios Exclusivos</h2>
+                <p>Nuestro curso está diseñado para proporcionarte todas las herramientas necesarias para comenzar tu viaje en el trading.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3>Aprendizaje Estructurado</h3>
+                    <p>Curso paso a paso desde los conceptos básicos hasta estrategias aplicables inmediatamente.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3>Análisis de Mercado</h3>
+                    <p>Aprende a leer gráficos e identificar patrones que te permitan tomar decisiones informadas.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <h3>Gestión de Riesgo</h3>
+                    <p>Domina las técnicas para proteger tu capital y maximizar tus ganancias potenciales.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        <table id="tablaResultados">
-            <thead>
-                <tr>
-                    <th>Factor</th>
-                    <th>Sell</th>
-                    <th>Buy</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Resultados se insertarán aquí -->
-            </tbody>
-        </table>
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <i class="fas fa-chart-line"></i> TradingPro
+                </div>
+                <div class="footer-links">
+                    <a href="#">Términos</a>
+                    <a href="#">Privacidad</a>
+                    <a href="#">FAQ</a>
+                    <a href="#">Soporte</a>
+                </div>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+                <div class="copyright">
+                    &copy; 2023 TradingPro. Todos los derechos reservados.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal de Autenticación -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-container">
+            <div class="auth-header">
+                <h2 id="authModalTitle">Iniciar Sesión</h2>
+                <button class="close-auth" id="closeAuth">&times;</button>
+            </div>
+            <form class="auth-form" id="loginForm">
+                <div id="authError" class="auth-error"></div>
+                <input type="email" id="loginEmail" placeholder="Correo electrónico" required>
+                <input type="password" id="loginPassword" placeholder="Contraseña" required>
+                <button type="submit" class="auth-submit">Iniciar Sesión</button>
+            </form>
+            <form class="auth-form" id="registerForm" style="display: none;">
+                <div id="registerError" class="auth-error"></div>
+                <input type="text" id="registerName" placeholder="Nombre completo" required>
+                <input type="email" id="registerEmail" placeholder="Correo electrónico" required>
+                <input type="password" id="registerPassword" placeholder="Contraseña" required>
+                <input type="password" id="registerConfirmPassword" placeholder="Confirmar contraseña" required>
+                <button type="submit" class="auth-submit">Registrarse</button>
+            </form>
+            <div class="auth-toggle">
+                <span id="toggleAuthForm">¿No tienes una cuenta? Regístrate</span>
+            </div>
+        </div>
     </div>
 
     <script>
-        function calcularValores() {
-            let maximo = parseFloat(document.getElementById("maximo").value);
-            let minimo = parseFloat(document.getElementById("minimo").value);
-
-            if (isNaN(maximo) || isNaN(minimo)) {
-                alert("Por favor ingrese valores válidos.");
+        // Inicializar Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyD3MI1klgBSHs1h6QT4VPNoScCfCwMV_Ck",
+            authDomain: "usuario-b0384.firebaseapp.com",
+            databaseURL: "https://usuario-b0384-default-rtdb.firebaseio.com",
+            projectId: "usuario-b0384",
+            storageBucket: "usuario-b0384.firebasestorage.app",
+            messagingSenderId: "196266170863",
+            appId: "1:196266170863:web:4ea57f489df94aba94fe1a"
+        };
+        
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+        
+        // Elementos del DOM
+        const authModal = document.getElementById('authModal');
+        const openLogin = document.getElementById('openLogin');
+        const openRegister = document.getElementById('openRegister');
+        const closeAuth = document.getElementById('closeAuth');
+        const authModalTitle = document.getElementById('authModalTitle');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const toggleAuthForm = document.getElementById('toggleAuthForm');
+        const authError = document.getElementById('authError');
+        const registerError = document.getElementById('registerError');
+        const heroCta = document.getElementById('heroCta');
+        
+        // Mostrar modal de login
+        openLogin.addEventListener('click', () => {
+            authModal.style.display = 'flex';
+            loginForm.style.display = 'flex';
+            registerForm.style.display = 'none';
+            authModalTitle.textContent = 'Iniciar Sesión';
+            toggleAuthForm.textContent = '¿No tienes una cuenta? Regístrate';
+            authError.textContent = '';
+        });
+        
+        // Mostrar modal de registro
+        openRegister.addEventListener('click', () => {
+            authModal.style.display = 'flex';
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'flex';
+            authModalTitle.textContent = 'Registrarse';
+            toggleAuthForm.textContent = '¿Ya tienes una cuenta? Inicia Sesión';
+            registerError.textContent = '';
+        });
+        
+        // Cerrar modal
+        closeAuth.addEventListener('click', () => {
+            authModal.style.display = 'none';
+        });
+        
+        // Alternar entre login y registro
+        toggleAuthForm.addEventListener('click', () => {
+            if (loginForm.style.display === 'none') {
+                loginForm.style.display = 'flex';
+                registerForm.style.display = 'none';
+                authModalTitle.textContent = 'Iniciar Sesión';
+                toggleAuthForm.textContent = '¿No tienes una cuenta? Regístrate';
+                authError.textContent = '';
+            } else {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'flex';
+                authModalTitle.textContent = 'Registrarse';
+                toggleAuthForm.textContent = '¿Ya tienes una cuenta? Inicia Sesión';
+                registerError.textContent = '';
+            }
+        });
+        
+        // Cerrar modal al hacer clic fuera
+        authModal.addEventListener('click', (e) => {
+            if (e.target === authModal) {
+                authModal.style.display = 'none';
+            }
+        });
+        
+        // Login
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Login exitoso
+                    authModal.style.display = 'none';
+                    loginForm.reset();
+                    window.location.href = 'dashboard.html';
+                })
+                .catch((error) => {
+                    authError.textContent = error.message;
+                });
+        });
+        
+        // Registro
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                registerError.textContent = 'Las contraseñas no coinciden';
                 return;
             }
-
-            let factores = [0, 0.24, 0.32, 0.50, 0.62, 1];
-            let pMedio = maximo - minimo;
-            let porcentaje = pMedio / 2;
-            let entrar = maximo - porcentaje;
-
-            let tbody = document.querySelector("#tablaResultados tbody");
-            tbody.innerHTML = ""; // Limpiar tabla antes de agregar nuevos datos
-
-            factores.forEach(factor => {
-                let sell = (factor * porcentaje - entrar).toFixed(2);
-                let buy = (factor * porcentaje + entrar).toFixed(2);
-
-                let fila = `<tr>
-                    <td>${factor}</td>
-                    <td>${sell}</td>
-                    <td>${buy}</td>
-                </tr>`;
-                tbody.innerHTML += fila;
-            });
-        }
+            
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Registro exitoso
+                    const user = userCredential.user;
+                    
+                    // Guardar datos adicionales en la base de datos
+                    const userRef = database.ref('users/' + user.uid);
+                    userRef.set({
+                        name: name,
+                        email: email,
+                        createdAt: firebase.database.ServerValue.TIMESTAMP,
+                        courseAccess: false,
+                        lastLogin: firebase.database.ServerValue.TIMESTAMP
+                    });
+                    
+                    authModal.style.display = 'none';
+                    registerForm.reset();
+                    window.location.href = 'dashboard.html';
+                })
+                .catch((error) => {
+                    registerError.textContent = error.message;
+                });
+        });
+        
+        // CTA button
+        heroCta.addEventListener('click', () => {
+            openRegister.click();
+        });
+        
+        // Verificar estado de autenticación
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // Usuario logueado
+                openLogin.style.display = 'none';
+                openRegister.style.display = 'none';
+                // Aquí podrías mostrar un botón de perfil o logout
+            } else {
+                // Usuario no logueado
+                openLogin.style.display = 'inline-block';
+                openRegister.style.display = 'inline-block';
+            }
+        });
     </script>
-
+</body>
+</html>
+<!-- partial -->
+  
 </body>
 </html>
