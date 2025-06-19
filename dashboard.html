@@ -1,0 +1,657 @@
+
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curso Básico de Trading | TradingPro</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Estilos -->
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #1e40af;
+            --accent: #3b82f6;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --success: #10b981;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f1f5f9;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo i {
+            color: var(--accent);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .logout-btn {
+            background: transparent;
+            border: 1px solid white;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .dashboard {
+            padding: 2rem 0;
+        }
+        
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .welcome-text h2 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .progress-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #e2e8f0;
+            border-radius: 5px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: var(--success);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .course-modules {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .module-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .module-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .module-icon {
+            width: 50px;
+            height: 50px;
+            background-color: rgba(37, 99, 235, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        
+        .module-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-completed {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+        
+        .status-pending {
+            background-color: rgba(234, 179, 8, 0.1);
+            color: #d97706;
+        }
+        
+        .module-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+        
+        .module-card p {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .module-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #64748b;
+            font-size: 0.8rem;
+        }
+        
+        .module-lessons {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .module-duration {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .content-container {
+            display: flex;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .sidebar {
+            width: 300px;
+            flex-shrink: 0;
+        }
+        
+        .sidebar-menu {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .sidebar-menu h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            color: var(--dark);
+        }
+        
+        .menu-item {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .menu-item a {
+            color: #64748b;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-item a:hover {
+            color: var(--primary);
+        }
+        
+        .menu-item.active a {
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            flex-grow: 1;
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .content-header {
+            margin-bottom: 1.5rem;
+        }
+        
+        .content-header h2 {
+            font-size: 1.5rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .breadcrumbs {
+            display: flex;
+            gap: 5px;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+        
+        .breadcrumbs a {
+            color: #64748b;
+            text-decoration: none;
+        }
+        
+        .breadcrumbs a:hover {
+            color: var(--primary);
+        }
+        
+        .breadcrumbs span {
+            color: var(--dark);
+        }
+        
+        .lesson-content {
+            line-height: 1.7;
+        }
+        
+        .lesson-content h3 {
+            font-size: 1.3rem;
+            margin: 1.5rem 0 1rem;
+            color: var(--dark);
+        }
+        
+        .lesson-content p {
+            margin-bottom: 1rem;
+        }
+        
+        .lesson-content ul, .lesson-content ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+        }
+        
+        .lesson-content li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .lesson-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 1rem 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .lesson-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .nav-button {
+            padding: 10px 20px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-button:hover {
+            background-color: var(--secondary);
+        }
+        
+        .nav-button.outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .nav-button.outline:hover {
+            background-color: rgba(37, 99, 235, 0.1);
+        }
+        
+        .completion-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #f8fafc;
+            border-radius: 8px;
+        }
+        
+        .completion-checkbox input {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .completion-checkbox label {
+            font-size: 0.9rem;
+            color: #64748b;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .content-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+            }
+            
+            .welcome-banner {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .progress-container {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <i class="fas fa-chart-line"></i>
+                    <span>TradingPro</span>
+                </div>
+                <div class="nav-links">
+                    <a href="#" class="active">Curso</a>
+                    <a href="#">Recursos</a>
+                    <a href="#">Comunidad</a>
+                </div>
+                <div class="user-menu">
+                    <button class="logout-btn" id="logoutBtn">Cerrar Sesión</button>
+                    <div class="user-avatar" id="userAvatar">JD</div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="dashboard">
+        <div class="container">
+            <div class="welcome-banner">
+                <div class="welcome-text">
+                    <h2 id="welcomeMessage">Bienvenido de nuevo, Juan</h2>
+                    <p>Continúa tu aprendizaje en el Curso Básico de Trading</p>
+                </div>
+                <div class="progress-container">
+                    <div>Tu progreso</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <span id="progressText">0% completado</span>
+                </div>
+            </div>
+            
+            <div class="content-container">
+                <aside class="sidebar">
+                    <div class="sidebar-menu">
+                        <h3>Curso Básico de Trading</h3>
+                        <div class="menu-item active">
+                            <a href="#"><i class="fas fa-play"></i> Introducción al Trading</a>
+                        </div>
+                        <div class="menu-item">
+                            <a href="#"><i class="fas fa-chart-line"></i> Análisis Técnico</a>
+                        </div>
+                        <div class="menu-item">
+                            <a href="#"><i class="fas fa-balance-scale"></i> Gestión de Riesgo</a>
+                        </div>
+                        <div class="menu-item">
+                            <a href="#"><i class="fas fa-brain"></i> Psicología del Trading</a>
+                        </div>
+                        <div class="menu-item">
+                            <a href="#"><i class="fas fa-chart-pie"></i> Estrategias Básicas</a>
+                        </div>
+                        <div class="menu-item">
+                            <a href="#"><i class="fas fa-laptop"></i> Plataformas de Trading</a>
+                        </div>
+                        <div class="menu-item">
+                            <a href="#"><i class="fas fa-trophy"></i> Evaluación Final</a>
+                        </div>
+                    </div>
+                </aside>
+                
+                <div class="main-content">
+                    <div class="content-header">
+                        <h2>Introducción al Trading</h2>
+                        <div class="breadcrumbs">
+                            <a href="#">Curso Básico</a> &gt; <span>Introducción al Trading</span>
+                        </div>
+                    </div>
+                    
+                    <div class="lesson-content">
+                        <h3>¿Qué es el Trading?</h3>
+                        <p>El trading consiste en la compra y venta de activos financieros (acciones, divisas, criptomonedas, materias primas, etc.) con el objetivo de obtener beneficios aprovechando las fluctuaciones de sus precios en el mercado.</p>
+                        
+                        <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Gráficos de trading">
+                        
+                        <h3>Mercados Financieros</h3>
+                        <p>Los principales mercados donde se realiza trading son:</p>
+                        <ul>
+                            <li><strong>Forex:</strong> Mercado de divisas (mayor mercado del mundo)</li>
+                            <li><strong>Acciones:</strong> Compra/venta de participaciones en empresas</li>
+                            <li><strong>Índices:</strong> Operaciones sobre cestas de acciones (S&P500, NASDAQ, etc.)</li>
+                            <li><strong>Materias primas:</strong> Oro, petróleo, plata, etc.</li>
+                            <li><strong>Criptomonedas:</strong> Bitcoin, Ethereum y otras monedas digitales</li>
+                        </ul>
+                        
+                        <h3>Conceptos Básicos</h3>
+                        <p>Para comenzar en el trading es fundamental entender estos términos:</p>
+                        <ul>
+                            <li><strong>Activo subyacente:</strong> El instrumento financiero sobre el que se opera</li>
+                            <li><strong>Spread:</strong> Diferencia entre precio de compra y venta</li>
+                            <li><strong>Apalancamiento:</strong> Multiplicador de la exposición al mercado</li>
+                            <li><strong>Largo (Long):</strong> Operación de compra esperando que suba el precio</li>
+                            <li><strong>Corto (Short):</strong> Operación de venta esperando que baje el precio</li>
+                            <li><strong>Lote:</strong> Tamaño estándar de una operación</li>
+                        </ul>
+                        
+                        <div class="completion-checkbox">
+                            <input type="checkbox" id="completeLesson">
+                            <label for="completeLesson">Marcar esta lección como completada</label>
+                        </div>
+                        
+                        <div class="lesson-nav">
+                            <button class="nav-button outline" disabled>
+                                <i class="fas fa-arrow-left"></i> Anterior
+                            </button>
+                            <button class="nav-button">
+                                Siguiente <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Inicializar Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyD3MI1klgBSHs1h6QT4VPNoScCfCwMV_Ck",
+            authDomain: "usuario-b0384.firebaseapp.com",
+            databaseURL: "https://usuario-b0384-default-rtdb.firebaseio.com",
+            projectId: "usuario-b0384",
+            storageBucket: "usuario-b0384.firebasestorage.app",
+            messagingSenderId: "196266170863",
+            appId: "1:196266170863:web:4ea57f489df94aba94fe1a"
+        };
+        
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+        
+        // Elementos del DOM
+        const logoutBtn = document.getElementById('logoutBtn');
+        const userAvatar = document.getElementById('userAvatar');
+        const welcomeMessage = document.getElementById('welcomeMessage');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const completeLesson = document.getElementById('completeLesson');
+        
+        // Verificar autenticación al cargar la página
+        auth.onAuthStateChanged((user) => {
+            if (!user) {
+                // Si no hay usuario logueado, redirigir al inicio
+                window.location.href = 'index.html';
+            } else {
+                // Mostrar información del usuario
+                const userName = user.displayName || user.email.split('@')[0];
+                welcomeMessage.textContent = `Bienvenido de nuevo, ${userName}`;
+                userAvatar.textContent = userName.charAt(0).toUpperCase();
+                
+                // Obtener progreso del usuario desde la base de datos
+                const userRef = database.ref('users/' + user.uid);
+                userRef.on('value', (snapshot) => {
+                    const userData = snapshot.val();
+                    const progress = userData.progress || 0;
+                    
+                    // Actualizar barra de progreso
+                    progressFill.style.width = `${progress}%`;
+                    progressText.textContent = `${progress}% completado`;
+                });
+            }
+        });
+        
+        // Cerrar sesión
+        logoutBtn.addEventListener('click', () => {
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
+            });
+        });
+        
+        // Marcar lección como completada
+        completeLesson.addEventListener('change', (e) => {
+            const user = auth.currentUser;
+            if (user) {
+                const userRef = database.ref('users/' + user.uid);
+                
+                if (e.target.checked) {
+                    // Actualizar progreso a 15% (primera lección completada)
+                    userRef.update({
+                        progress: 15,
+                        lastCompleted: firebase.database.ServerValue.TIMESTAMP
+                    });
+                } else {
+                    // Revertir progreso a 0%
+                    userRef.update({
+                        progress: 0,
+                        lastCompleted: null
+                    });
+                }
+            }
+        });
+        
+        // Simular progreso inicial (esto sería reemplazado por tu lógica real)
+        window.addEventListener('DOMContentLoaded', () => {
+            // Animación de la barra de progreso
+            setTimeout(() => {
+                progressFill.style.width = '15%';
+                progressText.textContent = '15% completado';
+            }, 500);
+        });
+    </script>
+</body>
+</html>
