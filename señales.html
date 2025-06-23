@@ -183,14 +183,20 @@
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
         }
         
+        .upload-container {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
         .upload-icon {
             cursor: pointer;
             font-size: 20px;
-            margin-left: 10px;
             color: var(--neon-blue);
             display: inline-flex;
             align-items: center;
             transition: transform 0.2s;
+            position: relative;
         }
         
         .upload-icon:hover {
@@ -198,7 +204,11 @@
         }
         
         .upload-icon input {
-            display: none;
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
         }
         
         .preview-container {
@@ -364,6 +374,30 @@
             background: #ff5555 !important;
             margin-left: 10px;
         }
+
+        .input-container {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .post-image-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            color: white;
+            margin-left: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .post-image-btn:hover {
+            transform: scale(1.1);
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
@@ -390,12 +424,14 @@
         </div>
         
         <div class="comment-box">
-            <input type="text" id="commentInput" placeholder="Escribe tu comentario o señal de trading...">
-            <label class="upload-icon" title="Subir imagen">
-                <i class="fas fa-image"></i>
-                <input type="file" id="imageInput" accept="image/*">
-            </label>
-            <button id="postButton" onclick="postComment()"><i class="fas fa-paper-plane"></i> Publicar</button>
+            <div class="input-container">
+                <input type="text" id="commentInput" placeholder="Escribe tu comentario o señal de trading...">
+                <div class="post-image-btn" onclick="document.getElementById('imageInput').click()">
+                    <i class="fas fa-image"></i>
+                </div>
+                <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                <button id="postButton" onclick="postComment()"><i class="fas fa-paper-plane"></i></button>
+            </div>
             
             <div class="preview-container">
                 <img id="imagePreview" class="preview-image">
@@ -465,7 +501,13 @@
             });
             
             // Configurar evento de subida de imagen
-            document.getElementById('imageInput').addEventListener('change', handleImageUpload);
+            document.getElementById('imageInput').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    selectedImage = file;
+                    showPreview(file);
+                }
+            });
         });
 
         // Mostrar formulario de login
@@ -504,39 +546,9 @@
                 });
         }
 
-        // Registrarse
-        function signUp() {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            const message = document.getElementById('loginMessage');
-            
-            message.textContent = '';
-            
-            auth.createUserWithEmailAndPassword(email, password)
-                .then(() => {
-                    // Actualizar nombre del usuario con el email (sin el dominio)
-                    const displayName = email.split('@')[0];
-                    return currentUser.updateProfile({
-                        displayName: displayName
-                    });
-                })
-                .catch(error => {
-                    message.textContent = error.message;
-                });
-        }
-
         // Cerrar sesión
         function logout() {
             auth.signOut();
-        }
-
-        // Manejar subida de imagen
-        function handleImageUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                selectedImage = file;
-                showPreview(file);
-            }
         }
 
         // Mostrar vista previa de imagen
@@ -562,8 +574,8 @@
             
             const postButton = document.getElementById("postButton");
             postButton.innerHTML = showSignalInput 
-                ? '<i class="fas fa-bolt"></i> Publicar señal' 
-                : '<i class="fas fa-paper-plane"></i> Publicar';
+                ? '<i class="fas fa-bolt"></i>' 
+                : '<i class="fas fa-paper-plane"></i>';
         }
 
         // Publicar comentario
@@ -604,16 +616,26 @@
                 
                 // Subir imagen si existe
                 if (selectedImage) {
-                    const storageRef = storage.ref(`comments/${currentUser.uid}/${Date.now()}`);
-                    storageRef.put(selectedImage).then(snapshot => {
-                        return snapshot.ref.getDownloadURL();
-                    }).then(imageUrl => {
-                        comment.imageUrl = imageUrl;
-                        saveCommentToDatabase(comment);
-                    }).catch(error => {
-                        console.error("Error uploading image:", error);
-                        saveCommentToDatabase(comment);
-                    });
+                    const storageRef = storage.ref(`comments/${currentUser.uid}/${Date.now()}_${selectedImage.name}`);
+                    const uploadTask = storageRef.put(selectedImage);
+                    
+                    uploadTask.on('state_changed', 
+                        (snapshot) => {
+                            // Progreso de la subida (opcional)
+                        }, 
+                        (error) => {
+                            console.error("Error uploading image:", error);
+                            // Guardar comentario sin imagen si hay error
+                            saveCommentToDatabase(comment);
+                        }, 
+                        () => {
+                            // Subida completada
+                            uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                                comment.imageUrl = downloadURL;
+                                saveCommentToDatabase(comment);
+                            });
+                        }
+                    );
                 } else {
                     saveCommentToDatabase(comment);
                 }
