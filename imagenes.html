@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subir Imágenes - Oxomax Trading</title>
+    <title>Publicar Imágenes - Oxomax Trading</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -17,7 +18,7 @@
         }
         
         .container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
             background-color: white;
             padding: 30px;
@@ -157,26 +158,74 @@
         
         .image-gallery {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
         }
         
         .gallery-item {
             position: relative;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s;
+            background-color: white;
         }
         
         .gallery-item:hover {
-            transform: scale(1.03);
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
         
         .gallery-item img {
             width: 100%;
-            height: 200px;
+            height: 250px;
             object-fit: cover;
+        }
+        
+        .gallery-item-info {
+            padding: 15px;
+        }
+        
+        .gallery-item-user {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .user-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-right: 10px;
+            object-fit: cover;
+        }
+        
+        .user-name {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .image-date {
+            font-size: 12px;
+            color: #777;
+        }
+        
+        .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(231, 76, 60, 0.8);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            display: none;
+        }
+        
+        .gallery-item:hover .delete-btn {
+            display: block;
         }
         
         .auth-message {
@@ -203,14 +252,28 @@
         .auth-btn:hover {
             background-color: #1a2a3a;
         }
+        
+        .post-caption {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-top: 10px;
+            resize: none;
+        }
+        
+        .post-caption:focus {
+            outline: none;
+            border-color: #1abb9c;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1><i class="fas fa-cloud-upload-alt"></i> Subir Imágenes a Oxomax Trading</h1>
+        <h1><i class="fas fa-images"></i> Publicar Imágenes en Oxomax Trading</h1>
         
         <div id="authSection" class="auth-message">
-            <p>Debes iniciar sesión para subir imágenes</p>
+            <p>Debes iniciar sesión para publicar imágenes</p>
             <button id="loginBtn" class="auth-btn">Iniciar Sesión</button>
             <button id="registerBtn" class="auth-btn">Registrarse</button>
         </div>
@@ -226,17 +289,23 @@
                 <input type="file" id="fileInput" class="file-input" accept="image/*" multiple>
             </div>
             
+            <textarea id="postCaption" class="post-caption" placeholder="Añade una descripción a tu publicación..."></textarea>
+            
             <div class="preview-container" id="previewContainer"></div>
             
             <div class="progress-container" id="progressContainer" style="display: none;">
                 <div class="progress-bar" id="progressBar"></div>
             </div>
             
+            <button id="publishBtn" class="upload-btn" style="display: none; margin-top: 15px; width: 100%;">Publicar Imágenes</button>
+            
             <div class="status" id="statusMessage"></div>
             
             <div class="gallery-container">
-                <h2 class="gallery-title">Tus Imágenes Subidas</h2>
-                <div class="image-gallery" id="imageGallery"></div>
+                <h2 class="gallery-title">Publicaciones Recientes</h2>
+                <div class="image-gallery" id="imageGallery">
+                    <p>Cargando publicaciones...</p>
+                </div>
             </div>
         </div>
     </div>
@@ -258,6 +327,7 @@
         const app = firebase.initializeApp(firebaseConfig);
         const storage = firebase.storage();
         const auth = firebase.auth();
+        const db = firebase.firestore();
 
         // DOM Elements
         const authSection = document.getElementById('authSection');
@@ -267,19 +337,23 @@
         const dropZone = document.getElementById('dropZone');
         const selectFilesBtn = document.getElementById('selectFilesBtn');
         const fileInput = document.getElementById('fileInput');
+        const postCaption = document.getElementById('postCaption');
         const previewContainer = document.getElementById('previewContainer');
         const progressContainer = document.getElementById('progressContainer');
         const progressBar = document.getElementById('progressBar');
+        const publishBtn = document.getElementById('publishBtn');
         const statusMessage = document.getElementById('statusMessage');
         const imageGallery = document.getElementById('imageGallery');
 
         // Variables
         let currentUser = null;
         let filesToUpload = [];
+        let postsListener = null;
 
         // Event Listeners
         selectFilesBtn.addEventListener('click', () => fileInput.click());
         fileInput.addEventListener('change', handleFileSelect);
+        publishBtn.addEventListener('click', publishPost);
         
         // Drag and drop events
         dropZone.addEventListener('dragover', (e) => {
@@ -309,11 +383,17 @@
                 currentUser = user;
                 authSection.style.display = 'none';
                 uploadSection.style.display = 'block';
-                loadUserImages();
+                loadPosts();
             } else {
                 currentUser = null;
                 authSection.style.display = 'block';
                 uploadSection.style.display = 'none';
+                
+                // Clean up listeners when user logs out
+                if (postsListener) {
+                    postsListener();
+                    postsListener = null;
+                }
             }
         });
 
@@ -333,9 +413,16 @@
         registerBtn.addEventListener('click', () => {
             const email = prompt("Ingresa tu correo electrónico:");
             const password = prompt("Ingresa tu contraseña:");
+            const displayName = prompt("Ingresa tu nombre de usuario:");
             
             if (email && password) {
                 auth.createUserWithEmailAndPassword(email, password)
+                    .then(userCredential => {
+                        // Update user profile with display name
+                        return userCredential.user.updateProfile({
+                            displayName: displayName || email.split('@')[0]
+                        });
+                    })
                     .catch(error => {
                         alert("Error al registrarse: " + error.message);
                     });
@@ -375,6 +462,9 @@
                         removeBtn.addEventListener('click', () => {
                             previewDiv.remove();
                             filesToUpload = filesToUpload.filter(f => f !== file);
+                            if (filesToUpload.length === 0) {
+                                publishBtn.style.display = 'none';
+                            }
                         });
                         
                         previewDiv.appendChild(img);
@@ -387,95 +477,217 @@
             }
             
             if (filesToUpload.length > 0) {
-                uploadFiles();
+                publishBtn.style.display = 'block';
             }
         }
 
-        // Upload files to Firebase Storage
-        function uploadFiles() {
+        // Publish post with images
+        async function publishPost() {
             if (!currentUser || filesToUpload.length === 0) return;
             
+            publishBtn.disabled = true;
+            publishBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publicando...';
             progressContainer.style.display = 'block';
             progressBar.style.width = '0%';
             statusMessage.style.display = 'none';
             
-            let uploadCount = 0;
-            const totalFiles = filesToUpload.length;
-            
-            filesToUpload.forEach(file => {
-                const storageRef = storage.ref(`users/${currentUser.uid}/images/${Date.now()}_${file.name}`);
-                const uploadTask = storageRef.put(file);
+            try {
+                const caption = postCaption.value.trim();
+                const imageUrls = [];
                 
-                uploadTask.on('state_changed',
-                    (snapshot) => {
-                        // Progress monitoring
-                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        progressBar.style.width = `${(uploadCount + (progress / 100)) / totalFiles * 100}%`;
-                    },
-                    (error) => {
-                        // Handle errors
-                        console.error("Error uploading file:", error);
-                        statusMessage.textContent = `Error al subir ${file.name}: ${error.message}`;
-                        statusMessage.className = 'status error';
-                        statusMessage.style.display = 'block';
-                    },
-                    () => {
-                        // Upload complete
-                        uploadCount++;
-                        progressBar.style.width = `${(uploadCount / totalFiles) * 100}%`;
-                        
-                        if (uploadCount === totalFiles) {
-                            statusMessage.textContent = `¡Se subieron ${uploadCount} imágenes correctamente!`;
-                            statusMessage.className = 'status success';
-                            statusMessage.style.display = 'block';
-                            
-                            // Clear previews and reset after 3 seconds
-                            setTimeout(() => {
-                                previewContainer.innerHTML = '';
-                                filesToUpload = [];
-                                progressContainer.style.display = 'none';
-                                statusMessage.style.display = 'none';
-                                loadUserImages();
-                            }, 3000);
-                        }
-                    }
-                );
-            });
-        }
-
-        // Load user's uploaded images
-        function loadUserImages() {
-            if (!currentUser) return;
-            
-            imageGallery.innerHTML = '<p>Cargando imágenes...</p>';
-            
-            const storageRef = storage.ref(`users/${currentUser.uid}/images`);
-            
-            storageRef.listAll().then(result => {
-                if (result.items.length === 0) {
-                    imageGallery.innerHTML = '<p>No has subido ninguna imagen todavía.</p>';
-                    return;
+                // Upload each image to Firebase Storage
+                for (let i = 0; i < filesToUpload.length; i++) {
+                    const file = filesToUpload[i];
+                    const storageRef = storage.ref(`posts/${currentUser.uid}/${Date.now()}_${file.name}`);
+                    const uploadTask = storageRef.put(file);
+                    
+                    // Wait for upload to complete
+                    const snapshot = await new Promise((resolve, reject) => {
+                        uploadTask.on('state_changed',
+                            (snapshot) => {
+                                // Update progress
+                                const progress = (i + (snapshot.bytesTransferred / snapshot.totalBytes)) / filesToUpload.length * 100;
+                                progressBar.style.width = `${progress}%`;
+                            },
+                            (error) => reject(error),
+                            () => resolve(uploadTask.snapshot)
+                        );
+                    });
+                    
+                    // Get download URL
+                    const downloadUrl = await snapshot.ref.getDownloadURL();
+                    imageUrls.push(downloadUrl);
                 }
                 
-                imageGallery.innerHTML = '';
+                // Create post document in Firestore
+                const postData = {
+                    userId: currentUser.uid,
+                    userEmail: currentUser.email,
+                    userName: currentUser.displayName || currentUser.email.split('@')[0],
+                    userAvatar: currentUser.photoURL || 'https://via.placeholder.com/50',
+                    caption: caption || '',
+                    images: imageUrls,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    likes: [],
+                    comments: []
+                };
                 
-                result.items.forEach(itemRef => {
-                    itemRef.getDownloadURL().then(url => {
-                        const galleryItem = document.createElement('div');
-                        galleryItem.className = 'gallery-item';
-                        
-                        const img = document.createElement('img');
-                        img.src = url;
-                        img.alt = 'Imagen subida';
-                        
-                        galleryItem.appendChild(img);
-                        imageGallery.appendChild(galleryItem);
+                await db.collection('posts').add(postData);
+                
+                // Reset form after successful upload
+                postCaption.value = '';
+                previewContainer.innerHTML = '';
+                filesToUpload = [];
+                publishBtn.style.display = 'none';
+                publishBtn.disabled = false;
+                publishBtn.innerHTML = 'Publicar Imágenes';
+                progressContainer.style.display = 'none';
+                
+                statusMessage.textContent = '¡Publicación creada exitosamente!';
+                statusMessage.className = 'status success';
+                statusMessage.style.display = 'block';
+                
+                setTimeout(() => {
+                    statusMessage.style.display = 'none';
+                }, 3000);
+                
+            } catch (error) {
+                console.error("Error publishing post:", error);
+                statusMessage.textContent = `Error al publicar: ${error.message}`;
+                statusMessage.className = 'status error';
+                statusMessage.style.display = 'block';
+                
+                publishBtn.disabled = false;
+                publishBtn.innerHTML = 'Publicar Imágenes';
+                progressContainer.style.display = 'none';
+            }
+        }
+
+        // Load posts from Firestore
+        function loadPosts() {
+            imageGallery.innerHTML = '<p>Cargando publicaciones...</p>';
+            
+            // Set up real-time listener for posts
+            postsListener = db.collection('posts')
+                .orderBy('timestamp', 'desc')
+                .onSnapshot(snapshot => {
+                    if (snapshot.empty) {
+                        imageGallery.innerHTML = '<p>No hay publicaciones aún. ¡Sé el primero en publicar!</p>';
+                        return;
+                    }
+                    
+                    imageGallery.innerHTML = '';
+                    
+                    snapshot.forEach(doc => {
+                        const post = doc.data();
+                        renderPost(doc.id, post);
                     });
+                }, error => {
+                    console.error("Error loading posts:", error);
+                    imageGallery.innerHTML = '<p class="error">Error al cargar las publicaciones</p>';
                 });
-            }).catch(error => {
-                console.error("Error loading images:", error);
-                imageGallery.innerHTML = '<p class="error">Error al cargar las imágenes</p>';
-            });
+        }
+
+        // Render a post in the gallery
+        function renderPost(postId, post) {
+            const galleryItem = document.createElement('div');
+            galleryItem.className = 'gallery-item';
+            
+            // Create image carousel for multiple images
+            const imagesContainer = document.createElement('div');
+            imagesContainer.style.position = 'relative';
+            imagesContainer.style.height = '250px';
+            imagesContainer.style.overflow = 'hidden';
+            
+            if (post.images.length > 0) {
+                const img = document.createElement('img');
+                img.src = post.images[0];
+                img.alt = 'Publicación de ' + post.userName;
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'cover';
+                imagesContainer.appendChild(img);
+            }
+            
+            // Add delete button if current user is the owner
+            if (currentUser && currentUser.uid === post.userId) {
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.innerHTML = '<i class="fas fa-trash"></i> Eliminar';
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (confirm('¿Estás seguro de que quieres eliminar esta publicación?')) {
+                        deletePost(postId, post);
+                    }
+                });
+                galleryItem.appendChild(deleteBtn);
+            }
+            
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'gallery-item-info';
+            
+            const userDiv = document.createElement('div');
+            userDiv.className = 'gallery-item-user';
+            
+            const avatarImg = document.createElement('img');
+            avatarImg.className = 'user-avatar';
+            avatarImg.src = post.userAvatar || 'https://via.placeholder.com/50';
+            avatarImg.alt = post.userName;
+            
+            const userNameSpan = document.createElement('span');
+            userNameSpan.className = 'user-name';
+            userNameSpan.textContent = post.userName;
+            
+            userDiv.appendChild(avatarImg);
+            userDiv.appendChild(userNameSpan);
+            
+            const dateSpan = document.createElement('span');
+            dateSpan.className = 'image-date';
+            dateSpan.textContent = new Date(post.timestamp?.toDate()).toLocaleString();
+            
+            const captionP = document.createElement('p');
+            captionP.textContent = post.caption || '';
+            captionP.style.marginTop = '10px';
+            captionP.style.fontSize = '14px';
+            
+            infoDiv.appendChild(userDiv);
+            infoDiv.appendChild(dateSpan);
+            infoDiv.appendChild(captionP);
+            
+            galleryItem.appendChild(imagesContainer);
+            galleryItem.appendChild(infoDiv);
+            
+            imageGallery.appendChild(galleryItem);
+        }
+
+        // Delete a post
+        async function deletePost(postId, post) {
+            try {
+                // First delete all images from storage
+                const deleteImagePromises = post.images.map(imageUrl => {
+                    const imageRef = storage.refFromURL(imageUrl);
+                    return imageRef.delete();
+                });
+                
+                await Promise.all(deleteImagePromises);
+                
+                // Then delete the post document
+                await db.collection('posts').doc(postId).delete();
+                
+                statusMessage.textContent = 'Publicación eliminada correctamente';
+                statusMessage.className = 'status success';
+                statusMessage.style.display = 'block';
+                
+                setTimeout(() => {
+                    statusMessage.style.display = 'none';
+                }, 3000);
+                
+            } catch (error) {
+                console.error("Error deleting post:", error);
+                statusMessage.textContent = 'Error al eliminar la publicación';
+                statusMessage.className = 'status error';
+                statusMessage.style.display = 'block';
+            }
         }
     </script>
 </body>
