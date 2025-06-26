@@ -3,947 +3,245 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oxomax Trading - Comunidad</title>
+    <title>Subir Imágenes - Oxomax Trading</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
     <style>
-        :root {
-            --primary: #2a3f54;
-            --secondary: #1abb9c;
-            --accent: #3498db;
-            --dark: #1a2a3a;
-            --light: #f7f7f7;
-            --danger: #e74c3c;
-            --success: #2ecc71;
-            --warning: #f39c12;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Montserrat', sans-serif;
-        }
-
         body {
+            font-family: 'Arial', sans-serif;
             background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
             color: #333;
-            line-height: 1.6;
         }
-
+        
         .container {
-            max-width: 1200px;
+            max-width: 800px;
             margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* Header */
-        header {
-            background-color: var(--primary);
-            color: white;
-            padding: 15px 0;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
         }
-
-        .header-content {
+        
+        h1 {
+            color: #2a3f54;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .upload-container {
+            border: 2px dashed #ccc;
+            padding: 30px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        
+        .upload-container:hover {
+            border-color: #2a3f54;
+        }
+        
+        .upload-container.dragover {
+            border-color: #1abb9c;
+            background-color: rgba(26, 187, 156, 0.1);
+        }
+        
+        .upload-icon {
+            font-size: 50px;
+            color: #2a3f54;
+            margin-bottom: 15px;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .upload-btn {
+            background-color: #1abb9c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .upload-btn:hover {
+            background-color: #17a689;
+        }
+        
+        .preview-container {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
         }
-
-        .logo {
-            font-size: 24px;
-            font-weight: 700;
+        
+        .image-preview {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            cursor: pointer;
             display: flex;
             align-items: center;
+            justify-content: center;
         }
-
-        .logo i {
-            margin-right: 10px;
-            color: var(--secondary);
+        
+        .progress-container {
+            width: 100%;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
         }
-
-        .auth-buttons button {
-            background-color: var(--secondary);
+        
+        .progress-bar {
+            height: 10px;
+            background-color: #1abb9c;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .gallery-container {
+            margin-top: 40px;
+        }
+        
+        .gallery-title {
+            color: #2a3f54;
+            border-bottom: 2px solid #1abb9c;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .gallery-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        
+        .gallery-item:hover {
+            transform: scale(1.03);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .auth-message {
+            text-align: center;
+            padding: 20px;
+            background-color: #fff3cd;
+            color: #856404;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .auth-btn {
+            background-color: #2a3f54;
             color: white;
             border: none;
             padding: 8px 15px;
             border-radius: 4px;
             cursor: pointer;
-            margin-left: 10px;
+            margin: 5px;
             font-weight: 500;
             transition: all 0.3s;
         }
-
-        .auth-buttons button:hover {
-            background-color: #17a689;
-        }
-
-        .auth-buttons button.outline {
-            background-color: transparent;
-            border: 1px solid white;
-        }
-
-        .auth-buttons button.outline:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .user-profile {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .user-profile img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            margin-right: 10px;
-            object-fit: cover;
-        }
-
-        .user-menu {
-            position: absolute;
-            top: 50px;
-            right: 0;
-            background-color: white;
-            border-radius: 4px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            width: 200px;
-            display: none;
-            z-index: 10;
-        }
-
-        .user-menu.show {
-            display: block;
-        }
-
-        .user-menu a {
-            display: block;
-            padding: 10px 15px;
-            color: #333;
-            text-decoration: none;
-            transition: all 0.3s;
-        }
-
-        .user-menu a:hover {
-            background-color: #f5f5f5;
-            color: var(--primary);
-        }
-
-        .user-menu a i {
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
-        }
-
-        /* Main Content */
-        .main-content {
-            display: flex;
-            margin-top: 20px;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 250px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            padding: 20px;
-            margin-right: 20px;
-            height: fit-content;
-        }
-
-        .sidebar-menu {
-            list-style: none;
-        }
-
-        .sidebar-menu li {
-            margin-bottom: 10px;
-        }
-
-        .sidebar-menu a {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            color: #555;
-            text-decoration: none;
-            border-radius: 4px;
-            transition: all 0.3s;
-        }
-
-        .sidebar-menu a:hover, .sidebar-menu a.active {
-            background-color: rgba(26, 187, 156, 0.1);
-            color: var(--primary);
-        }
-
-        .sidebar-menu a i {
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
-        }
-
-        /* Feed */
-        .feed {
-            flex: 1;
-        }
-
-        /* Create Post */
-        .create-post {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .post-input {
-            width: 100%;
-            min-height: 100px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 15px;
-            resize: none;
-            margin-bottom: 15px;
-            font-size: 16px;
-        }
-
-        .post-input:focus {
-            outline: none;
-            border-color: var(--secondary);
-        }
-
-        .post-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .file-upload {
-            position: relative;
-        }
-
-        .file-upload input {
-            position: absolute;
-            opacity: 0;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-        }
-
-        .file-upload-label {
-            display: flex;
-            align-items: center;
-            color: #555;
-            cursor: pointer;
-            padding: 8px 12px;
-            border-radius: 4px;
-            transition: all 0.3s;
-        }
-
-        .file-upload-label:hover {
-            background-color: #f5f5f5;
-        }
-
-        .file-upload-label i {
-            margin-right: 8px;
-            color: var(--accent);
-        }
-
-        .post-button {
-            background-color: var(--secondary);
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-
-        .post-button:hover {
-            background-color: #17a689;
-        }
-
-        .post-button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-
-        .image-preview {
-            margin-top: 15px;
-            display: none;
-        }
-
-        .image-preview img {
-            max-width: 100%;
-            max-height: 300px;
-            border-radius: 4px;
-        }
-
-        .remove-image {
-            display: inline-block;
-            margin-top: 10px;
-            color: var(--danger);
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        /* Posts */
-        .posts {
-            margin-bottom: 20px;
-        }
-
-        .post {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .post-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .post-user-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 15px;
-        }
-
-        .post-user-info h4 {
-            margin: 0;
-            font-size: 16px;
-            color: var(--primary);
-        }
-
-        .post-user-info p {
-            margin: 0;
-            font-size: 13px;
-            color: #777;
-        }
-
-        .post-content {
-            margin-bottom: 15px;
-            font-size: 15px;
-            line-height: 1.6;
-            white-space: pre-line;
-        }
-
-        .post-image {
-            width: 100%;
-            max-height: 400px;
-            object-fit: contain;
-            border-radius: 4px;
-            margin-bottom: 15px;
-            background-color: #f5f5f5;
-        }
-
-        .post-actions {
-            display: flex;
-            border-top: 1px solid #eee;
-            padding-top: 15px;
-        }
-
-        .post-action {
-            display: flex;
-            align-items: center;
-            margin-right: 20px;
-            color: #555;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .post-action:hover {
-            color: var(--secondary);
-        }
-
-        .post-action i {
-            margin-right: 5px;
-        }
-
-        /* Chat */
-        .chat-container {
-            display: none;
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 350px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            flex-direction: column;
-            height: 500px;
-        }
-
-        .chat-header {
-            background-color: var(--primary);
-            color: white;
-            padding: 15px;
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .chat-title {
-            font-weight: 600;
-        }
-
-        .chat-close {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-        }
-
-        .chat-messages {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-        }
-
-        .message {
-            margin-bottom: 15px;
-            display: flex;
-        }
-
-        .message.received {
-            justify-content: flex-start;
-        }
-
-        .message.sent {
-            justify-content: flex-end;
-        }
-
-        .message-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 10px;
-        }
-
-        .message-content {
-            max-width: 70%;
-        }
-
-        .message.received .message-content {
-            background-color: #f1f1f1;
-            color: #333;
-            padding: 10px 15px;
-            border-radius: 18px 18px 18px 0;
-        }
-
-        .message.sent .message-content {
-            background-color: var(--secondary);
-            color: white;
-            padding: 10px 15px;
-            border-radius: 18px 18px 0 18px;
-        }
-
-        .message-info {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            margin-top: 5px;
-            color: #777;
-        }
-
-        .message.sent .message-info {
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .chat-input-container {
-            display: flex;
-            padding: 10px;
-            border-top: 1px solid #eee;
-        }
-
-        .chat-input {
-            flex: 1;
-            padding: 10px 15px;
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            outline: none;
-            resize: none;
-        }
-
-        .chat-input:focus {
-            border-color: var(--secondary);
-        }
-
-        .chat-send {
-            background-color: var(--secondary);
-            color: white;
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            margin-left: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .chat-send:hover {
-            background-color: #17a689;
-        }
-
-        .chat-users {
-            display: none;
-            position: fixed;
-            bottom: 20px;
-            right: 380px;
-            width: 250px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            flex-direction: column;
-            height: 500px;
-        }
-
-        .chat-users-header {
-            background-color: var(--primary);
-            color: white;
-            padding: 15px;
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .chat-users-title {
-            font-weight: 600;
-        }
-
-        .chat-users-close {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-        }
-
-        .chat-users-list {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-        }
-
-        .chat-user {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 5px;
-        }
-
-        .chat-user:hover {
-            background-color: #f5f5f5;
-        }
-
-        .chat-user.active {
-            background-color: rgba(26, 187, 156, 0.1);
-        }
-
-        .chat-user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 10px;
-        }
-
-        .chat-user-name {
-            font-weight: 500;
-            color: #333;
-        }
-
-        .chat-user-status {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-left: auto;
-        }
-
-        .chat-user-status.online {
-            background-color: var(--success);
-        }
-
-        .chat-user-status.offline {
-            background-color: #ccc;
-        }
-
-        /* Auth Modals */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal.show {
-            display: flex;
-        }
-
-        .modal-content {
-            background-color: white;
-            border-radius: 8px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-
-        .modal-header {
-            background-color: var(--primary);
-            color: white;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-title {
-            font-weight: 600;
-            font-size: 18px;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-        }
-
-        .modal-body {
-            padding: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-            color: #555;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 10px 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--secondary);
-        }
-
-        .modal-footer {
-            padding: 15px 20px;
-            border-top: 1px solid #eee;
-            display: flex;
-            justify-content: flex-end;
-        }
-
-        .btn {
-            padding: 8px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.3s;
-            border: none;
-        }
-
-        .btn-primary {
-            background-color: var(--secondary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: #17a689;
-        }
-
-        .btn-secondary {
-            background-color: #f1f1f1;
-            color: #333;
-            margin-right: 10px;
-        }
-
-        .btn-secondary:hover {
-            background-color: #e1e1e1;
-        }
-
-        .auth-switch {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 14px;
-        }
-
-        .auth-switch a {
-            color: var(--secondary);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .auth-switch a:hover {
-            text-decoration: underline;
-        }
-
-        .error-message {
-            color: var(--danger);
-            font-size: 13px;
-            margin-top: 5px;
-            display: none;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .main-content {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                width: 100%;
-                margin-right: 0;
-                margin-bottom: 20px;
-            }
-
-            .chat-container {
-                width: 100%;
-                bottom: 0;
-                right: 0;
-                border-radius: 8px 8px 0 0;
-            }
-
-            .chat-users {
-                width: 100%;
-                right: 0;
-                bottom: 520px;
-                border-radius: 8px 8px 0 0;
-            }
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .fade-in {
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        /* Loading */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        
+        .auth-btn:hover {
+            background-color: #1a2a3a;
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <div class="container header-content">
-            <div class="logo">
-                <i class="fas fa-chart-line"></i>
-                <span>Oxomax Trading</span>
-            </div>
-            <div class="auth-buttons" id="authButtons">
-                <button class="outline" id="loginBtn">Iniciar Sesión</button>
-                <button id="registerBtn">Registrarse</button>
-            </div>
-            <div class="user-profile" id="userProfile" style="display: none;">
-                <img id="userAvatar" src="https://via.placeholder.com/40" alt="User Avatar">
-                <span id="userName">Usuario</span>
-                <div class="user-menu" id="userMenu">
-                    <a href="#"><i class="fas fa-user"></i> Perfil</a>
-                    <a href="#"><i class="fas fa-cog"></i> Configuración</a>
-                    <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
-                </div>
-            </div>
+    <div class="container">
+        <h1><i class="fas fa-cloud-upload-alt"></i> Subir Imágenes a Oxomax Trading</h1>
+        
+        <div id="authSection" class="auth-message">
+            <p>Debes iniciar sesión para subir imágenes</p>
+            <button id="loginBtn" class="auth-btn">Iniciar Sesión</button>
+            <button id="registerBtn" class="auth-btn">Registrarse</button>
         </div>
-    </header>
-
-    <!-- Main Content -->
-    <div class="container main-content">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <ul class="sidebar-menu">
-                <li><a href="#" class="active"><i class="fas fa-home"></i> Inicio</a></li>
-                <li><a href="#"><i class="fas fa-bell"></i> Notificaciones</a></li>
-                <li><a href="#" id="openChatUsers"><i class="fas fa-comments"></i> Mensajes</a></li>
-                <li><a href="#"><i class="fas fa-users"></i> Comunidad</a></li>
-                <li><a href="#"><i class="fas fa-chart-pie"></i> Trading</a></li>
-                <li><a href="#"><i class="fas fa-book"></i> Recursos</a></li>
-            </ul>
-        </div>
-
-        <!-- Feed -->
-        <div class="feed">
-            <!-- Create Post -->
-            <div class="create-post">
-                <textarea class="post-input" id="postContent" placeholder="¿Qué estás pensando hoy?"></textarea>
-                <div class="image-preview" id="imagePreview">
-                    <img id="previewImage" src="#" alt="Preview">
-                    <span class="remove-image" id="removeImage"><i class="fas fa-times"></i> Eliminar imagen</span>
+        
+        <div id="uploadSection" style="display: none;">
+            <div class="upload-container" id="dropZone">
+                <div class="upload-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
                 </div>
-                <div class="post-actions">
-                    <div class="file-upload">
-                        <label for="postImage" class="file-upload-label">
-                            <i class="fas fa-image"></i> Subir imagen
-                        </label>
-                        <input type="file" id="postImage" accept="image/*">
-                    </div>
-                    <button class="post-button" id="postButton" disabled>Publicar</button>
-                </div>
+                <h3>Arrastra y suelta tus imágenes aquí</h3>
+                <p>o</p>
+                <button id="selectFilesBtn" class="upload-btn">Seleccionar Archivos</button>
+                <input type="file" id="fileInput" class="file-input" accept="image/*" multiple>
             </div>
-
-            <!-- Posts -->
-            <div class="posts" id="postsContainer">
-                <!-- Posts will be loaded here -->
-                <div class="loading-posts">Cargando publicaciones...</div>
+            
+            <div class="preview-container" id="previewContainer"></div>
+            
+            <div class="progress-container" id="progressContainer" style="display: none;">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            
+            <div class="status" id="statusMessage"></div>
+            
+            <div class="gallery-container">
+                <h2 class="gallery-title">Tus Imágenes Subidas</h2>
+                <div class="image-gallery" id="imageGallery"></div>
             </div>
         </div>
     </div>
 
-    <!-- Chat Users -->
-    <div class="chat-users" id="chatUsers">
-        <div class="chat-users-header">
-            <div class="chat-users-title">Usuarios en línea</div>
-            <button class="chat-users-close" id="closeChatUsers">&times;</button>
-        </div>
-        <div class="chat-users-list" id="chatUsersList">
-            <!-- Users will be loaded here -->
-        </div>
-    </div>
-
-    <!-- Chat Container -->
-    <div class="chat-container" id="chatContainer">
-        <div class="chat-header">
-            <div class="chat-title" id="chatTitle">Chat</div>
-            <button class="chat-close" id="closeChat">&times;</button>
-        </div>
-        <div class="chat-messages" id="chatMessages">
-            <!-- Messages will be loaded here -->
-        </div>
-        <div class="chat-input-container">
-            <input type="text" class="chat-input" id="chatInput" placeholder="Escribe un mensaje...">
-            <button class="chat-send" id="chatSend"><i class="fas fa-paper-plane"></i></button>
-        </div>
-    </div>
-
-    <!-- Login Modal -->
-    <div class="modal" id="loginModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">Iniciar Sesión</div>
-                <button class="modal-close" id="closeLoginModal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="loginEmail">Correo electrónico</label>
-                    <input type="email" class="form-control" id="loginEmail" placeholder="tucorreo@ejemplo.com">
-                    <div class="error-message" id="loginEmailError"></div>
-                </div>
-                <div class="form-group">
-                    <label for="loginPassword">Contraseña</label>
-                    <input type="password" class="form-control" id="loginPassword" placeholder="••••••••">
-                    <div class="error-message" id="loginPasswordError"></div>
-                </div>
-                <div class="error-message" id="loginError"></div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" id="closeLoginBtn">Cancelar</button>
-                <button class="btn btn-primary" id="confirmLoginBtn">Iniciar Sesión</button>
-            </div>
-            <div class="auth-switch">
-                ¿No tienes una cuenta? <a href="#" id="switchToRegister">Regístrate</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Register Modal -->
-    <div class="modal" id="registerModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">Registrarse</div>
-                <button class="modal-close" id="closeRegisterModal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="registerName">Nombre completo</label>
-                    <input type="text" class="form-control" id="registerName" placeholder="Juan Pérez">
-                    <div class="error-message" id="registerNameError"></div>
-                </div>
-                <div class="form-group">
-                    <label for="registerEmail">Correo electrónico</label>
-                    <input type="email" class="form-control" id="registerEmail" placeholder="tucorreo@ejemplo.com">
-                    <div class="error-message" id="registerEmailError"></div>
-                </div>
-                <div class="form-group">
-                    <label for="registerPassword">Contraseña</label>
-                    <input type="password" class="form-control" id="registerPassword" placeholder="••••••••">
-                    <div class="error-message" id="registerPasswordError"></div>
-                </div>
-                <div class="form-group">
-                    <label for="registerConfirmPassword">Confirmar contraseña</label>
-                    <input type="password" class="form-control" id="registerConfirmPassword" placeholder="••••••••">
-                    <div class="error-message" id="registerConfirmPasswordError"></div>
-                </div>
-                <div class="error-message" id="registerError"></div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" id="closeRegisterBtn">Cancelar</button>
-                <button class="btn btn-primary" id="confirmRegisterBtn">Registrarse</button>
-            </div>
-            <div class="auth-switch">
-                ¿Ya tienes una cuenta? <a href="#" id="switchToLogin">Inicia Sesión</a>
-            </div>
-        </div>
-    </div>
-
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <script>
         // Firebase configuration
         const firebaseConfig = {
@@ -951,623 +249,233 @@
             authDomain: "usuario-b0384.firebaseapp.com",
             databaseURL: "https://usuario-b0384-default-rtdb.firebaseio.com",
             projectId: "usuario-b0384",
-            storageBucket: "usuario-b0384.firebasestorage.app",
+            storageBucket: "usuario-b0384.appspot.com",
             messagingSenderId: "196266170863",
             appId: "1:196266170863:web:4ea57f489df94aba94fe1a"
         };
 
         // Initialize Firebase
         const app = firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
         const storage = firebase.storage();
+        const auth = firebase.auth();
 
         // DOM Elements
-        const authButtons = document.getElementById('authButtons');
-        const userProfile = document.getElementById('userProfile');
-        const userName = document.getElementById('userName');
-        const userAvatar = document.getElementById('userAvatar');
-        const userMenu = document.getElementById('userMenu');
-        const logoutBtn = document.getElementById('logoutBtn');
-
-        // Modals
-        const loginModal = document.getElementById('loginModal');
-        const registerModal = document.getElementById('registerModal');
+        const authSection = document.getElementById('authSection');
+        const uploadSection = document.getElementById('uploadSection');
         const loginBtn = document.getElementById('loginBtn');
         const registerBtn = document.getElementById('registerBtn');
-        const closeLoginModal = document.getElementById('closeLoginModal');
-        const closeRegisterModal = document.getElementById('closeRegisterModal');
-        const closeLoginBtn = document.getElementById('closeLoginBtn');
-        const closeRegisterBtn = document.getElementById('closeRegisterBtn');
-        const confirmLoginBtn = document.getElementById('confirmLoginBtn');
-        const confirmRegisterBtn = document.getElementById('confirmRegisterBtn');
-        const switchToRegister = document.getElementById('switchToRegister');
-        const switchToLogin = document.getElementById('switchToLogin');
-
-        // Post elements
-        const postContent = document.getElementById('postContent');
-        const postImage = document.getElementById('postImage');
-        const postButton = document.getElementById('postButton');
-        const imagePreview = document.getElementById('imagePreview');
-        const previewImage = document.getElementById('previewImage');
-        const removeImage = document.getElementById('removeImage');
-        const postsContainer = document.getElementById('postsContainer');
-
-        // Chat elements
-        const chatContainer = document.getElementById('chatContainer');
-        const chatUsers = document.getElementById('chatUsers');
-        const openChatUsers = document.getElementById('openChatUsers');
-        const closeChat = document.getElementById('closeChat');
-        const closeChatUsers = document.getElementById('closeChatUsers');
-        const chatMessages = document.getElementById('chatMessages');
-        const chatInput = document.getElementById('chatInput');
-        const chatSend = document.getElementById('chatSend');
-        const chatUsersList = document.getElementById('chatUsersList');
-        const chatTitle = document.getElementById('chatTitle');
+        const dropZone = document.getElementById('dropZone');
+        const selectFilesBtn = document.getElementById('selectFilesBtn');
+        const fileInput = document.getElementById('fileInput');
+        const previewContainer = document.getElementById('previewContainer');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const statusMessage = document.getElementById('statusMessage');
+        const imageGallery = document.getElementById('imageGallery');
 
         // Variables
         let currentUser = null;
-        let selectedUserId = null;
-        let selectedUserName = null;
-        let selectedUserAvatar = null;
-        let postsListener = null;
-        let usersListener = null;
-        let chatListener = null;
-        let imageFile = null;
+        let filesToUpload = [];
 
         // Event Listeners
-        loginBtn.addEventListener('click', () => loginModal.classList.add('show'));
-        registerBtn.addEventListener('click', () => registerModal.classList.add('show'));
-        closeLoginModal.addEventListener('click', () => loginModal.classList.remove('show'));
-        closeRegisterModal.addEventListener('click', () => registerModal.classList.remove('show'));
-        closeLoginBtn.addEventListener('click', () => loginModal.classList.remove('show'));
-        closeRegisterBtn.addEventListener('click', () => registerModal.classList.remove('show'));
-        switchToRegister.addEventListener('click', (e) => {
+        selectFilesBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleFileSelect);
+        
+        // Drag and drop events
+        dropZone.addEventListener('dragover', (e) => {
             e.preventDefault();
-            loginModal.classList.remove('show');
-            registerModal.classList.add('show');
+            dropZone.classList.add('dragover');
         });
-        switchToLogin.addEventListener('click', (e) => {
+        
+        ['dragleave', 'dragend'].forEach(type => {
+            dropZone.addEventListener(type, () => {
+                dropZone.classList.remove('dragover');
+            });
+        });
+        
+        dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
-            registerModal.classList.remove('show');
-            loginModal.classList.add('show');
-        });
-
-        // User profile menu
-        userProfile.addEventListener('click', () => {
-            userMenu.classList.toggle('show');
-        });
-
-        // Logout
-        logoutBtn.addEventListener('click', () => {
-            auth.signOut();
-        });
-
-        // Post content validation
-        postContent.addEventListener('input', () => {
-            validatePost();
-        });
-
-        // Post image upload
-        postImage.addEventListener('change', (e) => {
-            if (e.target.files[0]) {
-                imageFile = e.target.files[0];
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    previewImage.src = event.target.result;
-                    imagePreview.style.display = 'block';
-                };
-                reader.readAsDataURL(imageFile);
-                validatePost();
-            }
-        });
-
-        // Remove image
-        removeImage.addEventListener('click', () => {
-            imageFile = null;
-            previewImage.src = '#';
-            imagePreview.style.display = 'none';
-            postImage.value = '';
-            validatePost();
-        });
-
-        // Create post
-        postButton.addEventListener('click', async () => {
-            if (!currentUser) return;
-
-            const content = postContent.value.trim();
-            if (!content && !imageFile) return;
-
-            postButton.disabled = true;
-            postButton.innerHTML = '<div class="loading"></div>';
-
-            try {
-                let imageUrl = null;
-                
-                if (imageFile) {
-                    // Upload image to Firebase Storage
-                    const storageRef = storage.ref(`posts/${currentUser.uid}/${Date.now()}_${imageFile.name}`);
-                    const snapshot = await storageRef.put(imageFile);
-                    imageUrl = await snapshot.ref.getDownloadURL();
-                }
-
-                // Add post to Firestore
-                await db.collection('posts').add({
-                    content: content,
-                    userId: currentUser.uid,
-                    userEmail: currentUser.email,
-                    userName: currentUser.displayName || currentUser.email.split('@')[0],
-                    userAvatar: currentUser.photoURL || 'https://via.placeholder.com/50',
-                    imageUrl: imageUrl || null,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    likes: [],
-                    comments: []
-                });
-
-                // Clear post form
-                postContent.value = '';
-                imageFile = null;
-                previewImage.src = '#';
-                imagePreview.style.display = 'none';
-                postImage.value = '';
-                postButton.disabled = true;
-                postButton.textContent = 'Publicar';
-            } catch (error) {
-                console.error('Error creating post:', error);
-                postButton.disabled = false;
-                postButton.textContent = 'Publicar';
-            }
-        });
-
-        // Chat users
-        openChatUsers.addEventListener('click', () => {
-            chatUsers.style.display = 'flex';
-        });
-
-        closeChatUsers.addEventListener('click', () => {
-            chatUsers.style.display = 'none';
-        });
-
-        closeChat.addEventListener('click', () => {
-            chatContainer.style.display = 'none';
-        });
-
-        // Chat send message
-        chatSend.addEventListener('click', sendMessage);
-        chatInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
-
-        // Functions
-        function validatePost() {
-            const content = postContent.value.trim();
-            postButton.disabled = !(content || imageFile);
-        }
-
-        function sendMessage() {
-            const message = chatInput.value.trim();
-            if (!message || !selectedUserId || !currentUser) return;
-
-            db.collection('chats').add({
-                senderId: currentUser.uid,
-                receiverId: selectedUserId,
-                message: message,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                read: false
-            });
-
-            chatInput.value = '';
-        }
-
-        function renderMessage(message, isSent) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+            dropZone.classList.remove('dragover');
             
-            if (!isSent) {
-                const avatarImg = document.createElement('img');
-                avatarImg.className = 'message-avatar';
-                avatarImg.src = selectedUserAvatar || 'https://via.placeholder.com/32';
-                messageDiv.appendChild(avatarImg);
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                handleFileSelect({ target: fileInput });
             }
+        });
 
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'message-content';
-            contentDiv.textContent = message.message;
-
-            const infoDiv = document.createElement('div');
-            infoDiv.className = 'message-info';
-            
-            const timeSpan = document.createElement('span');
-            timeSpan.textContent = new Date(message.timestamp?.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            
-            infoDiv.appendChild(timeSpan);
-            contentDiv.appendChild(infoDiv);
-            messageDiv.appendChild(contentDiv);
-
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        function renderPost(post) {
-            const postDiv = document.createElement('div');
-            postDiv.className = 'post fade-in';
-            postDiv.id = `post-${post.id}`;
-
-            const postHeader = document.createElement('div');
-            postHeader.className = 'post-header';
-
-            const avatarImg = document.createElement('img');
-            avatarImg.className = 'post-user-avatar';
-            avatarImg.src = post.userAvatar || 'https://via.placeholder.com/50';
-            avatarImg.alt = post.userName;
-
-            const userInfoDiv = document.createElement('div');
-            userInfoDiv.className = 'post-user-info';
-
-            const userNameH4 = document.createElement('h4');
-            userNameH4.textContent = post.userName;
-
-            const timeP = document.createElement('p');
-            timeP.textContent = new Date(post.timestamp?.toDate()).toLocaleString();
-
-            userInfoDiv.appendChild(userNameH4);
-            userInfoDiv.appendChild(timeP);
-            postHeader.appendChild(avatarImg);
-            postHeader.appendChild(userInfoDiv);
-
-            const postContentDiv = document.createElement('div');
-            postContentDiv.className = 'post-content';
-            postContentDiv.textContent = post.content;
-
-            postDiv.appendChild(postHeader);
-            postDiv.appendChild(postContentDiv);
-
-            if (post.imageUrl) {
-                const postImage = document.createElement('img');
-                postImage.className = 'post-image';
-                postImage.src = post.imageUrl;
-                postImage.alt = 'Post image';
-                postDiv.appendChild(postImage);
-            }
-
-            const postActions = document.createElement('div');
-            postActions.className = 'post-actions';
-
-            const likeAction = document.createElement('div');
-            likeAction.className = 'post-action';
-            likeAction.innerHTML = '<i class="far fa-heart"></i> Me gusta';
-
-            const commentAction = document.createElement('div');
-            commentAction.className = 'post-action';
-            commentAction.innerHTML = '<i class="far fa-comment"></i> Comentar';
-
-            const shareAction = document.createElement('div');
-            shareAction.className = 'post-action';
-            shareAction.innerHTML = '<i class="fas fa-share"></i> Compartir';
-
-            postActions.appendChild(likeAction);
-            postActions.appendChild(commentAction);
-            postActions.appendChild(shareAction);
-            postDiv.appendChild(postActions);
-
-            // Insert at the beginning of the posts container
-            if (postsContainer.firstChild.classList?.contains('loading-posts')) {
-                postsContainer.replaceChild(postDiv, postsContainer.firstChild);
-            } else {
-                postsContainer.insertBefore(postDiv, postsContainer.firstChild);
-            }
-        }
-
-        function renderUser(user) {
-            const userDiv = document.createElement('div');
-            userDiv.className = `chat-user ${user.id === selectedUserId ? 'active' : ''}`;
-            userDiv.dataset.userId = user.id;
-
-            const avatarImg = document.createElement('img');
-            avatarImg.className = 'chat-user-avatar';
-            avatarImg.src = user.photoURL || 'https://via.placeholder.com/40';
-            avatarImg.alt = user.displayName;
-
-            const nameDiv = document.createElement('div');
-            nameDiv.className = 'chat-user-name';
-            nameDiv.textContent = user.displayName || user.email.split('@')[0];
-
-            const statusDiv = document.createElement('div');
-            statusDiv.className = `chat-user-status ${user.online ? 'online' : 'offline'}`;
-
-            userDiv.appendChild(avatarImg);
-            userDiv.appendChild(nameDiv);
-            userDiv.appendChild(statusDiv);
-
-            userDiv.addEventListener('click', () => {
-                selectedUserId = user.id;
-                selectedUserName = user.displayName || user.email.split('@')[0];
-                selectedUserAvatar = user.photoURL || 'https://via.placeholder.com/40';
-                
-                // Update active user in list
-                document.querySelectorAll('.chat-user').forEach(u => u.classList.remove('active'));
-                userDiv.classList.add('active');
-                
-                // Update chat title
-                chatTitle.textContent = `Chat con ${selectedUserName}`;
-                
-                // Load chat messages
-                loadChatMessages();
-                
-                // Open chat container
-                chatContainer.style.display = 'flex';
-                chatUsers.style.display = 'none';
-            });
-
-            chatUsersList.appendChild(userDiv);
-        }
-
-        async function loadPosts() {
-            if (postsListener) postsListener(); // Remove previous listener
-
-            postsListener = db.collection('posts')
-                .orderBy('timestamp', 'desc')
-                .onSnapshot(snapshot => {
-                    snapshot.docChanges().forEach(change => {
-                        if (change.type === 'added') {
-                            renderPost({ id: change.doc.id, ...change.doc.data() });
-                        }
-                    });
-                });
-        }
-
-        async function loadUsers() {
-            if (usersListener) usersListener(); // Remove previous listener
-
-            usersListener = db.collection('users').onSnapshot(snapshot => {
-                chatUsersList.innerHTML = ''; // Clear current list
-
-                snapshot.forEach(doc => {
-                    if (doc.id !== currentUser.uid) {
-                        renderUser({ id: doc.id, ...doc.data() });
-                    }
-                });
-            });
-        }
-
-        async function loadChatMessages() {
-            if (chatListener) chatListener(); // Remove previous listener
-
-            chatMessages.innerHTML = ''; // Clear current messages
-
-            chatListener = db.collection('chats')
-                .where('senderId', 'in', [currentUser.uid, selectedUserId])
-                .where('receiverId', 'in', [currentUser.uid, selectedUserId])
-                .orderBy('timestamp', 'asc')
-                .onSnapshot(snapshot => {
-                    snapshot.docChanges().forEach(change => {
-                        if (change.type === 'added') {
-                            const message = change.doc.data();
-                            renderMessage(message, message.senderId === currentUser.uid);
-                        }
-                    });
-                });
-        }
-
-        // Auth state listener
-        auth.onAuthStateChanged(async (user) => {
+        // Auth state change
+        auth.onAuthStateChanged(user => {
             if (user) {
-                // User is signed in
                 currentUser = user;
-                authButtons.style.display = 'none';
-                userProfile.style.display = 'flex';
-                
-                // Set user info
-                userName.textContent = user.displayName || user.email.split('@')[0];
-                userAvatar.src = user.photoURL || 'https://via.placeholder.com/40';
-                
-                // Create or update user document
-                await db.collection('users').doc(user.uid).set({
-                    email: user.email,
-                    displayName: user.displayName || user.email.split('@')[0],
-                    photoURL: user.photoURL || 'https://via.placeholder.com/40',
-                    lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
-                    online: true
-                }, { merge: true });
-                
-                // Set user as online
-                const userStatusRef = db.collection('users').doc(user.uid);
-                const isOfflineForFirestore = {
-                    online: false,
-                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-                };
-                
-                const isOnlineForFirestore = {
-                    online: true,
-                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-                };
-                
-                // Monitor connection state
-                firebase.database().ref('.info/connected').on('value', async (snapshot) => {
-                    if (snapshot.val() === false) return;
-                    
-                    await userStatusRef.update(isOnlineForFirestore);
-                    
-                    // Set user as offline when they disconnect
-                    firebase.database().ref(`/status/${user.uid}`).onDisconnect()
-                        .set(isOfflineForFirestore)
-                        .then(() => {
-                            firebase.database().ref(`/status/${user.uid}`).set(isOnlineForFirestore);
-                        });
-                });
-                
-                // Load data
-                loadPosts();
-                loadUsers();
+                authSection.style.display = 'none';
+                uploadSection.style.display = 'block';
+                loadUserImages();
             } else {
-                // User is signed out
                 currentUser = null;
-                authButtons.style.display = 'block';
-                userProfile.style.display = 'none';
-                
-                // Clear listeners
-                if (postsListener) postsListener();
-                if (usersListener) usersListener();
-                if (chatListener) chatListener();
-                
-                // Clear UI
-                postsContainer.innerHTML = '<div class="loading-posts">Cargando publicaciones...</div>';
-                chatUsersList.innerHTML = '';
-                chatMessages.innerHTML = '';
+                authSection.style.display = 'block';
+                uploadSection.style.display = 'none';
             }
         });
 
-        // Login
-        confirmLoginBtn.addEventListener('click', async () => {
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value.trim();
+        // Auth buttons
+        loginBtn.addEventListener('click', () => {
+            const email = prompt("Ingresa tu correo electrónico:");
+            const password = prompt("Ingresa tu contraseña:");
             
-            // Reset errors
-            document.getElementById('loginEmailError').style.display = 'none';
-            document.getElementById('loginPasswordError').style.display = 'none';
-            document.getElementById('loginError').style.display = 'none';
-            
-            // Validate
-            let isValid = true;
-            
-            if (!email) {
-                document.getElementById('loginEmailError').textContent = 'El correo electrónico es requerido';
-                document.getElementById('loginEmailError').style.display = 'block';
-                isValid = false;
+            if (email && password) {
+                auth.signInWithEmailAndPassword(email, password)
+                    .catch(error => {
+                        alert("Error al iniciar sesión: " + error.message);
+                    });
             }
+        });
+        
+        registerBtn.addEventListener('click', () => {
+            const email = prompt("Ingresa tu correo electrónico:");
+            const password = prompt("Ingresa tu contraseña:");
             
-            if (!password) {
-                document.getElementById('loginPasswordError').textContent = 'La contraseña es requerida';
-                document.getElementById('loginPasswordError').style.display = 'block';
-                isValid = false;
+            if (email && password) {
+                auth.createUserWithEmailAndPassword(email, password)
+                    .catch(error => {
+                        alert("Error al registrarse: " + error.message);
+                    });
             }
-            
-            if (!isValid) return;
-            
-            confirmLoginBtn.disabled = true;
-            confirmLoginBtn.innerHTML = '<div class="loading"></div>';
-            
-            try {
-                await auth.signInWithEmailAndPassword(email, password);
-                loginModal.classList.remove('show');
-                document.getElementById('loginEmail').value = '';
-                document.getElementById('loginPassword').value = '';
-            } catch (error) {
-                console.error('Login error:', error);
-                document.getElementById('loginError').textContent = getAuthErrorMessage(error.code);
-                document.getElementById('loginError').style.display = 'block';
-            }
-            
-            confirmLoginBtn.disabled = false;
-            confirmLoginBtn.textContent = 'Iniciar Sesión';
         });
 
-        // Register
-        confirmRegisterBtn.addEventListener('click', async () => {
-            const name = document.getElementById('registerName').value.trim();
-            const email = document.getElementById('registerEmail').value.trim();
-            const password = document.getElementById('registerPassword').value.trim();
-            const confirmPassword = document.getElementById('registerConfirmPassword').value.trim();
+        // Handle file selection
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
             
-            // Reset errors
-            document.getElementById('registerNameError').style.display = 'none';
-            document.getElementById('registerEmailError').style.display = 'none';
-            document.getElementById('registerPasswordError').style.display = 'none';
-            document.getElementById('registerConfirmPasswordError').style.display = 'none';
-            document.getElementById('registerError').style.display = 'none';
+            previewContainer.innerHTML = '';
+            filesToUpload = [];
             
-            // Validate
-            let isValid = true;
-            
-            if (!name) {
-                document.getElementById('registerNameError').textContent = 'El nombre es requerido';
-                document.getElementById('registerNameError').style.display = 'block';
-                isValid = false;
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                
+                if (!file.type.match('image.*')) {
+                    continue;
+                }
+                
+                filesToUpload.push(file);
+                
+                const reader = new FileReader();
+                reader.onload = (function(file) {
+                    return function(e) {
+                        const previewDiv = document.createElement('div');
+                        previewDiv.className = 'image-preview';
+                        
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.alt = file.name;
+                        
+                        const removeBtn = document.createElement('button');
+                        removeBtn.className = 'remove-btn';
+                        removeBtn.innerHTML = '×';
+                        removeBtn.addEventListener('click', () => {
+                            previewDiv.remove();
+                            filesToUpload = filesToUpload.filter(f => f !== file);
+                        });
+                        
+                        previewDiv.appendChild(img);
+                        previewDiv.appendChild(removeBtn);
+                        previewContainer.appendChild(previewDiv);
+                    };
+                })(file);
+                
+                reader.readAsDataURL(file);
             }
             
-            if (!email) {
-                document.getElementById('registerEmailError').textContent = 'El correo electrónico es requerido';
-                document.getElementById('registerEmailError').style.display = 'block';
-                isValid = false;
+            if (filesToUpload.length > 0) {
+                uploadFiles();
             }
+        }
+
+        // Upload files to Firebase Storage
+        function uploadFiles() {
+            if (!currentUser || filesToUpload.length === 0) return;
             
-            if (!password) {
-                document.getElementById('registerPasswordError').textContent = 'La contraseña es requerida';
-                document.getElementById('registerPasswordError').style.display = 'block';
-                isValid = false;
-            } else if (password.length < 6) {
-                document.getElementById('registerPasswordError').textContent = 'La contraseña debe tener al menos 6 caracteres';
-                document.getElementById('registerPasswordError').style.display = 'block';
-                isValid = false;
-            }
+            progressContainer.style.display = 'block';
+            progressBar.style.width = '0%';
+            statusMessage.style.display = 'none';
             
-            if (!confirmPassword) {
-                document.getElementById('registerConfirmPasswordError').textContent = 'Confirma tu contraseña';
-                document.getElementById('registerConfirmPasswordError').style.display = 'block';
-                isValid = false;
-            } else if (password !== confirmPassword) {
-                document.getElementById('registerConfirmPasswordError').textContent = 'Las contraseñas no coinciden';
-                document.getElementById('registerConfirmPasswordError').style.display = 'block';
-                isValid = false;
-            }
+            let uploadCount = 0;
+            const totalFiles = filesToUpload.length;
             
-            if (!isValid) return;
+            filesToUpload.forEach(file => {
+                const storageRef = storage.ref(`users/${currentUser.uid}/images/${Date.now()}_${file.name}`);
+                const uploadTask = storageRef.put(file);
+                
+                uploadTask.on('state_changed',
+                    (snapshot) => {
+                        // Progress monitoring
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        progressBar.style.width = `${(uploadCount + (progress / 100)) / totalFiles * 100}%`;
+                    },
+                    (error) => {
+                        // Handle errors
+                        console.error("Error uploading file:", error);
+                        statusMessage.textContent = `Error al subir ${file.name}: ${error.message}`;
+                        statusMessage.className = 'status error';
+                        statusMessage.style.display = 'block';
+                    },
+                    () => {
+                        // Upload complete
+                        uploadCount++;
+                        progressBar.style.width = `${(uploadCount / totalFiles) * 100}%`;
+                        
+                        if (uploadCount === totalFiles) {
+                            statusMessage.textContent = `¡Se subieron ${uploadCount} imágenes correctamente!`;
+                            statusMessage.className = 'status success';
+                            statusMessage.style.display = 'block';
+                            
+                            // Clear previews and reset after 3 seconds
+                            setTimeout(() => {
+                                previewContainer.innerHTML = '';
+                                filesToUpload = [];
+                                progressContainer.style.display = 'none';
+                                statusMessage.style.display = 'none';
+                                loadUserImages();
+                            }, 3000);
+                        }
+                    }
+                );
+            });
+        }
+
+        // Load user's uploaded images
+        function loadUserImages() {
+            if (!currentUser) return;
             
-            confirmRegisterBtn.disabled = true;
-            confirmRegisterBtn.innerHTML = '<div class="loading"></div>';
+            imageGallery.innerHTML = '<p>Cargando imágenes...</p>';
             
-            try {
-                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                await userCredential.user.updateProfile({
-                    displayName: name
+            const storageRef = storage.ref(`users/${currentUser.uid}/images`);
+            
+            storageRef.listAll().then(result => {
+                if (result.items.length === 0) {
+                    imageGallery.innerHTML = '<p>No has subido ninguna imagen todavía.</p>';
+                    return;
+                }
+                
+                imageGallery.innerHTML = '';
+                
+                result.items.forEach(itemRef => {
+                    itemRef.getDownloadURL().then(url => {
+                        const galleryItem = document.createElement('div');
+                        galleryItem.className = 'gallery-item';
+                        
+                        const img = document.createElement('img');
+                        img.src = url;
+                        img.alt = 'Imagen subida';
+                        
+                        galleryItem.appendChild(img);
+                        imageGallery.appendChild(galleryItem);
+                    });
                 });
-                
-                // Create user document
-                await db.collection('users').doc(userCredential.user.uid).set({
-                    email: email,
-                    displayName: name,
-                    photoURL: 'https://via.placeholder.com/40',
-                    lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
-                    online: true
-                });
-                
-                registerModal.classList.remove('show');
-                document.getElementById('registerName').value = '';
-                document.getElementById('registerEmail').value = '';
-                document.getElementById('registerPassword').value = '';
-                document.getElementById('registerConfirmPassword').value = '';
-            } catch (error) {
-                console.error('Register error:', error);
-                document.getElementById('registerError').textContent = getAuthErrorMessage(error.code);
-                document.getElementById('registerError').style.display = 'block';
-            }
-            
-            confirmRegisterBtn.disabled = false;
-            confirmRegisterBtn.textContent = 'Registrarse';
-        });
-
-        // Helper function to get auth error messages
-        function getAuthErrorMessage(errorCode) {
-            switch (errorCode) {
-                case 'auth/email-already-in-use':
-                    return 'Este correo electrónico ya está en uso';
-                case 'auth/invalid-email':
-                    return 'Correo electrónico inválido';
-                case 'auth/operation-not-allowed':
-                    return 'Operación no permitida';
-                case 'auth/weak-password':
-                    return 'La contraseña es demasiado débil';
-                case 'auth/user-disabled':
-                    return 'Esta cuenta ha sido deshabilitada';
-                case 'auth/user-not-found':
-                    return 'No se encontró una cuenta con este correo electrónico';
-                case 'auth/wrong-password':
-                    return 'Contraseña incorrecta';
-                default:
-                    return 'Ocurrió un error. Por favor intenta nuevamente.';
-            }
+            }).catch(error => {
+                console.error("Error loading images:", error);
+                imageGallery.innerHTML = '<p class="error">Error al cargar las imágenes</p>';
+            });
         }
     </script>
 </body>
