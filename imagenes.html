@@ -1,94 +1,226 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <!-- ... (mantén tus metadatos y estilos existentes) ... -->
-    
-    <!-- Agrega los SDKs de Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
-    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galería Cloudinary Mejorada</title>
     <style>
-        /* ... (mantén tus estilos existentes) ... */
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --danger: #f72585;
+        }
         
-        /* Agrega estilos para el sistema de autenticación */
-        .auth-section {
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--dark);
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+            font-size: 2.5rem;
+        }
+        
+        .upload-section {
             background: white;
             border-radius: 15px;
-            padding: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 3rem;
+            transition: all 0.3s ease;
+        }
+        
+        .file-upload {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            padding: 2rem;
+            border: 2px dashed var(--accent);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        /* ... (otros estilos se mantienen igual) ... */
+
+        /* Nuevos estilos para formularios de auth */
+        .auth-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
+            max-width: 400px;
+            margin: 0 auto 2rem;
+        }
+        
+        .auth-form h2 {
+            margin-bottom: 1.5rem;
             text-align: center;
+            color: var(--primary);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
         }
         
         .auth-btn {
+            width: 100%;
+            padding: 0.8rem;
             background: linear-gradient(to right, var(--primary), var(--secondary));
             color: white;
             border: none;
-            padding: 0.6rem 1.5rem;
-            border-radius: 50px;
-            font-size: 0.9rem;
+            border-radius: 5px;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
-            margin: 0 0.5rem;
         }
         
-        .user-info {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
+        .auth-btn:hover {
+            opacity: 0.9;
         }
         
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
+        .auth-toggle {
+            text-align: center;
+            margin-top: 1rem;
         }
         
-        .delete-btn {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: rgba(247, 37, 133, 0.8);
-            color: white;
+        .auth-toggle button {
+            background: none;
             border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            color: var(--primary);
+            text-decoration: underline;
             cursor: pointer;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        
-        .gallery-item:hover .delete-btn {
-            opacity: 1;
+            font-size: 0.9rem;
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <!-- Sección de autenticación -->
-        <div class="auth-section" id="authSection">
-            <div id="authState">
-                <p>Inicia sesión para subir imágenes</p>
-                <button id="loginBtn" class="auth-btn">Iniciar sesión</button>
-                <button id="registerBtn" class="auth-btn">Registrarse</button>
+        <!-- Formulario de Login (visible inicialmente) -->
+        <div id="loginForm" class="auth-form">
+            <h2>Iniciar Sesión</h2>
+            <div class="form-group">
+                <label for="loginEmail">Email:</label>
+                <input type="email" id="loginEmail" placeholder="tu@email.com">
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Contraseña:</label>
+                <input type="password" id="loginPassword" placeholder="••••••••">
+            </div>
+            <button id="loginBtn" class="auth-btn">Iniciar Sesión</button>
+            <div class="auth-toggle">
+                <p>¿No tienes cuenta? <button id="showRegister">Regístrate</button></p>
+            </div>
+        </div>
+        
+        <!-- Formulario de Registro (oculto inicialmente) -->
+        <div id="registerForm" class="auth-form" style="display: none;">
+            <h2>Crear Cuenta</h2>
+            <div class="form-group">
+                <label for="registerEmail">Email:</label>
+                <input type="email" id="registerEmail" placeholder="tu@email.com">
+            </div>
+            <div class="form-group">
+                <label for="registerPassword">Contraseña:</label>
+                <input type="password" id="registerPassword" placeholder="••••••••">
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">Confirmar Contraseña:</label>
+                <input type="password" id="confirmPassword" placeholder="••••••••">
+            </div>
+            <button id="registerBtn" class="auth-btn">Registrarse</button>
+            <div class="auth-toggle">
+                <p>¿Ya tienes cuenta? <button id="showLogin">Inicia Sesión</button></p>
+            </div>
+        </div>
+        
+        <!-- Panel de usuario (oculto inicialmente) -->
+        <div id="userPanel" style="display: none; text-align: center; margin-bottom: 2rem;">
+            <div class="user-info" style="display: inline-flex; align-items: center; background: white; padding: 1rem; border-radius: 50px; box-shadow: 0 3px 10px rgba(0,0,0,0.1);">
+                <img id="userAvatar" src="" alt="Avatar" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 1rem;">
+                <p id="userEmail" style="margin-right: 1rem;"></p>
+                <button id="logoutBtn" style="background: var(--danger); color: white; border: none; border-radius: 5px; padding: 0.5rem 1rem; cursor: pointer;">Cerrar Sesión</button>
             </div>
         </div>
         
         <h1>Galería Cloudinary Mejorada</h1>
         
-        <!-- ... (mantén el resto de tu HTML existente) ... -->
+        <!-- Sección de subida (visible solo cuando el usuario está autenticado) -->
+        <div class="upload-section" id="uploadSection" style="display: none;">
+            <div class="file-upload" id="dropArea">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Arrastra tu imagen aquí o haz clic para seleccionar</p>
+                <input type="file" id="fileInput" accept="image/*">
+            </div>
+            
+            <img id="preview" alt="Vista previa" style="display: none; max-width: 100%; max-height: 400px; border-radius: 10px; margin-top: 1rem;">
+            
+            <div class="progress-container" id="progressContainer" style="display: none; width: 100%; background: #e9ecef; border-radius: 50px; margin: 1rem 0; overflow: hidden; height: 10px;">
+                <div id="progressBar" style="height: 100%; background: linear-gradient(to right, var(--accent), var(--success)); width: 0%; transition: width 0.3s ease;"></div>
+            </div>
+            
+            <button id="uploadBtn" style="display: none; background: linear-gradient(to right, var(--primary), var(--secondary)); color: white; border: none; padding: 0.8rem 2rem; border-radius: 50px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; margin: 1rem auto 0;">Subir Imagen <i class="fas fa-upload"></i></button>
+            
+            <div id="statusMessage" style="display: none; text-align: center; padding: 1.2rem; margin: 1rem 0; border-radius: 8px;"></div>
+        </div>
+        
+        <div class="gallery" id="gallery" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem; margin-top: 3rem;">
+            <!-- Las imágenes se cargarán aquí -->
+        </div>
     </div>
 
-    <!-- ... (mantén tu modal existente) ... -->
+    <!-- Modal para imagen expandida -->
+    <div id="imageModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); overflow: auto;">
+        <span class="close" style="position: absolute; top: 25px; right: 35px; color: white; font-size: 40px; font-weight: bold; cursor: pointer;">&times;</span>
+        <div class="modal-content" style="display: flex; justify-content: center; align-items: center; height: 100%; padding: 2rem;">
+            <img id="expandedImg" class="modal-img" src="" alt="Imagen expandida" style="max-width: 90%; max-height: 90%; object-fit: contain; border-radius: 8px;">
+        </div>
+    </div>
 
+    <!-- Firebase y Cloudinary JS -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
     <script>
         // Configuración de Firebase
         const firebaseConfig = {
@@ -96,66 +228,100 @@
             authDomain: "usuario-b0384.firebaseapp.com",
             databaseURL: "https://usuario-b0384-default-rtdb.firebaseio.com",
             projectId: "usuario-b0384",
-            storageBucket: "usuario-b0384.firebasestorage.app",
+            storageBucket: "usuario-b0384.appspot.com",
             messagingSenderId: "196266170863",
             appId: "1:196266170863:web:4ea57f489df94aba94fe1a"
         };
         
         // Inicializa Firebase
-        const app = firebase.initializeApp(firebaseConfig);
+        firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const database = firebase.database();
         
-        // Configuración de Cloudinary (mantén tu configuración existente)
-        const cloudName = 'dba9d8';
-        const apiKey = '528757166221984';
-        const unsignedUploadPreset = 'web_upload';
+        // Configuración de Cloudinary (REEMPLAZA CON TUS DATOS REALES)
+        const cloudName = 'tu_cloud_name';  // Ejemplo: 'mi-cloud'
+        const apiKey = 'tu_api_key';       // Ejemplo: '123456789012345'
+        const unsignedUploadPreset = 'tu_upload_preset'; // Ejemplo: 'mi_preset'
         
-        // Elementos del DOM (agrega los nuevos)
-        const authSection = document.getElementById('authSection');
-        const authState = document.getElementById('authState');
-        const loginBtn = document.getElementById('loginBtn');
-        const registerBtn = document.getElementById('registerBtn');
+        // Elementos del DOM
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const userPanel = document.getElementById('userPanel');
+        const uploadSection = document.getElementById('uploadSection');
+        const fileInput = document.getElementById('fileInput');
+        const dropArea = document.getElementById('dropArea');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const preview = document.getElementById('preview');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const statusMessage = document.getElementById('statusMessage');
+        const gallery = document.getElementById('gallery');
+        const modal = document.getElementById('imageModal');
+        const expandedImg = document.getElementById('expandedImg');
+        const closeBtn = document.querySelector('.close');
         
-        // ... (mantén tus otras variables existentes) ...
-        
-        // Estado del usuario
+        // Estado de la aplicación
         let currentUser = null;
         
-        // Cargar imágenes al iniciar
+        // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
             setupAuthListeners();
-            loadImagesFromFirebase();
             setupEventListeners();
+            loadImagesFromFirebase();
         });
         
         function setupAuthListeners() {
+            // Cambios en el estado de autenticación
             auth.onAuthStateChanged(user => {
                 currentUser = user;
-                updateAuthUI();
                 
                 if (user) {
+                    // Usuario autenticado
+                    loginForm.style.display = 'none';
+                    registerForm.style.display = 'none';
+                    userPanel.style.display = 'block';
+                    uploadSection.style.display = 'block';
+                    
+                    // Mostrar info del usuario
+                    document.getElementById('userEmail').textContent = user.email;
+                    document.getElementById('userAvatar').src = `https://ui-avatars.com/api/?name=${user.email}&background=random`;
+                    
+                    // Cargar imágenes
                     loadImagesFromFirebase();
+                } else {
+                    // Usuario no autenticado
+                    loginForm.style.display = 'block';
+                    registerForm.style.display = 'none';
+                    userPanel.style.display = 'none';
+                    uploadSection.style.display = 'none';
                 }
             });
             
-            loginBtn.addEventListener('click', () => {
-                // Implementa tu lógica de inicio de sesión
-                const email = prompt("Ingresa tu email:");
-                const password = prompt("Ingresa tu contraseña:");
+            // Login
+            document.getElementById('loginBtn').addEventListener('click', () => {
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
                 
                 if (email && password) {
                     auth.signInWithEmailAndPassword(email, password)
                         .catch(error => {
                             showStatus(`Error al iniciar sesión: ${error.message}`, 'error');
                         });
+                } else {
+                    showStatus('Por favor ingresa email y contraseña', 'error');
                 }
             });
             
-            registerBtn.addEventListener('click', () => {
-                // Implementa tu lógica de registro
-                const email = prompt("Ingresa tu email para registrarte:");
-                const password = prompt("Crea una contraseña:");
+            // Registro
+            document.getElementById('registerBtn').addEventListener('click', () => {
+                const email = document.getElementById('registerEmail').value;
+                const password = document.getElementById('registerPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                if (password !== confirmPassword) {
+                    showStatus('Las contraseñas no coinciden', 'error');
+                    return;
+                }
                 
                 if (email && password) {
                     auth.createUserWithEmailAndPassword(email, password)
@@ -165,73 +331,64 @@
                         .catch(error => {
                             showStatus(`Error al registrarse: ${error.message}`, 'error');
                         });
+                } else {
+                    showStatus('Por favor completa todos los campos', 'error');
+                }
+            });
+            
+            // Cerrar sesión
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                auth.signOut();
+            });
+            
+            // Cambiar entre login y registro
+            document.getElementById('showRegister').addEventListener('click', () => {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+            });
+            
+            document.getElementById('showLogin').addEventListener('click', () => {
+                registerForm.style.display = 'none';
+                loginForm.style.display = 'block';
+            });
+        }
+        
+        function setupEventListeners() {
+            // Drag and drop
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropArea.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, unhighlight, false);
+            });
+            
+            dropArea.addEventListener('drop', handleDrop, false);
+            dropArea.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', handleFileSelect);
+            uploadBtn.addEventListener('click', uploadImage);
+            
+            // Modal
+            closeBtn.addEventListener('click', () => {
+                modal.style.display = "none";
+            });
+            
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = "none";
                 }
             });
         }
         
-        function updateAuthUI() {
-            if (currentUser) {
-                authState.innerHTML = `
-                    <div class="user-info">
-                        <img src="https://ui-avatars.com/api/?name=${currentUser.email}&background=random" 
-                             alt="Avatar" class="user-avatar">
-                        <p>Bienvenido, ${currentUser.email}</p>
-                        <button id="logoutBtn" class="auth-btn">Cerrar sesión</button>
-                    </div>
-                `;
-                
-                document.getElementById('logoutBtn').addEventListener('click', () => {
-                    auth.signOut();
-                });
-                
-                // Mostrar sección de subida solo para usuarios autenticados
-                document.querySelector('.upload-section').style.display = 'block';
-            } else {
-                authState.innerHTML = `
-                    <p>Inicia sesión para subir imágenes</p>
-                    <button id="loginBtn" class="auth-btn">Iniciar sesión</button>
-                    <button id="registerBtn" class="auth-btn">Registrarse</button>
-                `;
-                
-                // Ocultar sección de subida para usuarios no autenticados
-                document.querySelector('.upload-section').style.display = 'none';
-                
-                // Reasignar event listeners a los nuevos botones
-                document.getElementById('loginBtn').addEventListener('click', () => {
-                    const email = prompt("Ingresa tu email:");
-                    const password = prompt("Ingresa tu contraseña:");
-                    
-                    if (email && password) {
-                        auth.signInWithEmailAndPassword(email, password)
-                            .catch(error => {
-                                showStatus(`Error al iniciar sesión: ${error.message}`, 'error');
-                            });
-                    }
-                });
-                
-                document.getElementById('registerBtn').addEventListener('click', () => {
-                    const email = prompt("Ingresa tu email para registrarte:");
-                    const password = prompt("Crea una contraseña:");
-                    
-                    if (email && password) {
-                        auth.createUserWithEmailAndPassword(email, password)
-                            .then(() => {
-                                showStatus('¡Registro exitoso!', 'success');
-                            })
-                            .catch(error => {
-                                showStatus(`Error al registrarse: ${error.message}`, 'error');
-                            });
-                    }
-                });
-            }
-        }
-        
         function loadImagesFromFirebase() {
-            gallery.innerHTML = ''; // Limpiar galería
-            
             database.ref('images').once('value').then(snapshot => {
-                const imagesData = snapshot.val() || {};
+                gallery.innerHTML = ''; // Limpiar galería
                 
+                const imagesData = snapshot.val() || {};
                 Object.keys(imagesData).forEach(key => {
                     createGalleryItem(imagesData[key]);
                 });
@@ -241,20 +398,26 @@
         function createGalleryItem(imgData) {
             const galleryItem = document.createElement('div');
             galleryItem.className = 'gallery-item';
-            galleryItem.dataset.id = imgData.id;
+            galleryItem.style.background = 'white';
+            galleryItem.style.borderRadius = '10px';
+            galleryItem.style.overflow = 'hidden';
+            galleryItem.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+            galleryItem.style.transition = 'all 0.3s ease';
+            galleryItem.style.position = 'relative';
+            galleryItem.style.cursor = 'pointer';
             
             galleryItem.innerHTML = `
-                <img src="${imgData.secure_url}" alt="Imagen subida" class="gallery-img">
-                <div class="gallery-info">
+                <img src="${imgData.secure_url}" alt="Imagen subida" style="width: 100%; height: 250px; object-fit: cover;">
+                <div style="padding: 1.5rem;">
                     <p><strong>Tamaño:</strong> ${(imgData.bytes/1024).toFixed(1)} KB</p>
                     <p><strong>Subido por:</strong> ${imgData.uploadedBy || 'Anónimo'}</p>
-                    <p class="gallery-url">${imgData.public_id || 'Imagen subida'}</p>
+                    <p style="font-size: 0.9rem; color: #6c757d; word-break: break-all; margin-top: 0.5rem;">${imgData.public_id || 'Imagen subida'}</p>
                 </div>
-                <button class="copy-btn" title="Copiar URL" data-url="${imgData.secure_url}">
+                <button class="copy-btn" title="Copiar URL" data-url="${imgData.secure_url}" style="position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; transition: opacity 0.3s;">
                     <i class="fas fa-copy"></i>
                 </button>
                 ${currentUser && currentUser.uid === imgData.uploadedByUid ? 
-                    `<button class="delete-btn" title="Eliminar imagen">
+                    `<button class="delete-btn" title="Eliminar imagen" style="position: absolute; top: 15px; left: 15px; background: rgba(247, 37, 133, 0.8); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; transition: opacity 0.3s;">
                         <i class="fas fa-trash"></i>
                     </button>` : ''}
             `;
@@ -273,7 +436,7 @@
                 copyToClipboard(imgData.secure_url, e.currentTarget);
             });
             
-            // Evento para eliminar imagen (si existe el botón)
+            // Evento para eliminar imagen (si el usuario es el propietario)
             const deleteBtn = galleryItem.querySelector('.delete-btn');
             if (deleteBtn) {
                 deleteBtn.addEventListener('click', (e) => {
@@ -282,6 +445,34 @@
                         deleteImage(imgData.id, imgData.public_id);
                     }
                 });
+            }
+        }
+        
+        // ... (resto de las funciones como preventDefaults, highlight, handleDrop, etc. se mantienen igual) ...
+        
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Validar tipo y tamaño
+                if (!file.type.match('image.*')) {
+                    showStatus('Solo se permiten archivos de imagen', 'error');
+                    return;
+                }
+                
+                if (file.size > 10 * 1024 * 1024) {
+                    showStatus('La imagen es demasiado grande (máx. 10MB)', 'error');
+                    return;
+                }
+                
+                // Mostrar vista previa
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    preview.src = event.target.result;
+                    preview.style.display = 'block';
+                    uploadBtn.style.display = 'block';
+                    uploadBtn.disabled = false;
+                };
+                reader.readAsDataURL(file);
             }
         }
         
@@ -338,24 +529,58 @@
             }
         }
         
-        async function deleteImage(imageId, publicId) {
-            try {
-                // 1. Eliminar de Firebase
-                await database.ref(`images/${imageId}`).remove();
-                
-                // 2. Opcional: Eliminar de Cloudinary (requiere autenticación del lado del servidor)
-                // Nota: Para esto necesitarías un backend, ya que requiere tu API secret
-                
-                showStatus('Imagen eliminada', 'success');
-                
-                // Eliminar visualmente de la galería
-                document.querySelector(`.gallery-item[data-id="${imageId}"]`)?.remove();
-            } catch (error) {
-                showStatus(`Error al eliminar: ${error.message}`, 'error');
-            }
+        function resetUploadForm() {
+            fileInput.value = '';
+            preview.style.display = 'none';
+            progressContainer.style.display = 'none';
+            progressBar.style.width = '0%';
         }
         
-        // ... (mantén tus otras funciones existentes) ...
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = `status ${type}`;
+            statusMessage.style.display = 'block';
+            statusMessage.style.backgroundColor = type === 'success' ? 'rgba(76, 201, 240, 0.2)' : 'rgba(247, 37, 133, 0.2)';
+            statusMessage.style.color = '#212529';
+            
+            setTimeout(() => {
+                statusMessage.style.display = 'none';
+            }, 5000);
+        }
+        
+        function copyToClipboard(url, button) {
+            navigator.clipboard.writeText(url).then(() => {
+                const icon = button.querySelector('i');
+                const originalClass = icon.className;
+                icon.className = 'fas fa-check';
+                
+                setTimeout(() => {
+                    icon.className = originalClass;
+                }, 2000);
+            });
+        }
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        function highlight() {
+            dropArea.style.borderColor = '#4361ee';
+            dropArea.style.backgroundColor = 'rgba(72, 149, 239, 0.05)';
+        }
+        
+        function unhighlight() {
+            dropArea.style.borderColor = '#4895ef';
+            dropArea.style.backgroundColor = '';
+        }
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            fileInput.files = files;
+            handleFileSelect({ target: fileInput });
+        }
     </script>
 </body>
 </html>
