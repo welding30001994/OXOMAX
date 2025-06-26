@@ -3,501 +3,747 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Control Avícola</title>
+  <title>Control Avícola Integral</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
   <style>
+    :root {
+      --primary: #3498db;
+      --success: #2ecc71;
+      --danger: #e74c3c;
+      --warning: #f39c12;
+      --dark: #2c3e50;
+      --light: #ecf0f1;
+      --gray: #95a5a6;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       line-height: 1.6;
       color: #333;
+      background-color: #f5f5f5;
+      padding: 20px;
+    }
+    
+    .container {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 20px;
-      background-color: #f5f5f5;
     }
     
-    h1, h2, h3 {
-      color: #2c3e50;
+    /* Header */
+    header {
+      background-color: var(--dark);
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px 8px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
     }
     
-    section {
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    /* Auth Forms */
+    .auth-container {
+      max-width: 500px;
+      margin: 50px auto;
       background: white;
       border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      overflow: hidden;
     }
     
-    form div {
+    .auth-tabs {
+      display: flex;
+    }
+    
+    .auth-tab {
+      flex: 1;
+      text-align: center;
+      padding: 15px;
+      cursor: pointer;
+      background: var(--light);
+      transition: all 0.3s;
+    }
+    
+    .auth-tab.active {
+      background: white;
+      font-weight: bold;
+    }
+    
+    .auth-form {
+      padding: 20px;
+      display: none;
+    }
+    
+    .auth-form.active {
+      display: block;
+    }
+    
+    .form-group {
       margin-bottom: 15px;
     }
     
-    label {
+    .form-group label {
       display: block;
       margin-bottom: 5px;
       font-weight: bold;
     }
     
-    input, select, textarea {
+    .form-control {
       width: 100%;
       padding: 10px;
       border: 1px solid #ddd;
       border-radius: 4px;
-      box-sizing: border-box;
-    }
-    
-    textarea {
-      min-height: 80px;
-    }
-    
-    button {
-      background-color: #3498db;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 4px;
-      cursor: pointer;
       font-size: 16px;
     }
     
-    button:hover {
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      text-align: center;
+      transition: background-color 0.3s;
+    }
+    
+    .btn:hover {
       background-color: #2980b9;
     }
     
-    .delete-btn {
-      background-color: #e74c3c;
+    .btn-block {
+      display: block;
+      width: 100%;
     }
     
-    .delete-btn:hover {
+    .btn-success {
+      background-color: var(--success);
+    }
+    
+    .btn-success:hover {
+      background-color: #27ae60;
+    }
+    
+    .btn-danger {
+      background-color: var(--danger);
+    }
+    
+    .btn-danger:hover {
       background-color: #c0392b;
     }
     
-    #auth-section {
-      max-width: 500px;
-      margin: 0 auto;
+    /* App Sections */
+    .app-section {
+      display: none;
     }
     
-    .auth-form {
-      margin-bottom: 30px;
+    .app-section.active {
+      display: block;
+    }
+    
+    /* Dashboard */
+    .dashboard-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .card h3 {
+      color: var(--dark);
+      margin-bottom: 15px;
+      font-size: 18px;
+    }
+    
+    .card-value {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    
+    .income-value {
+      color: var(--success);
+    }
+    
+    .expense-value {
+      color: var(--danger);
+    }
+    
+    .balance-value {
+      color: var(--dark);
+    }
+    
+    /* Transaction Form */
+    .transaction-form {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+    
+    /* Transactions List */
+    .transactions-list {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      overflow: hidden;
     }
     
     .transaction-item {
-      border-left: 4px solid;
-      padding: 15px;
-      margin-bottom: 15px;
-      background: white;
-      border-radius: 4px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-    
-    .transaction-item.income {
-      border-left-color: #2ecc71;
-    }
-    
-    .transaction-item.expense {
-      border-left-color: #e74c3c;
-    }
-    
-    .transaction-header {
+      padding: 15px 20px;
+      border-bottom: 1px solid #eee;
       display: flex;
       justify-content: space-between;
-      margin-bottom: 10px;
-      flex-wrap: wrap;
+      align-items: center;
     }
     
-    .transaction-amount {
+    .transaction-item:last-child {
+      border-bottom: none;
+    }
+    
+    .transaction-details {
+      flex: 1;
+    }
+    
+    .transaction-type {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 12px;
       font-weight: bold;
+      text-transform: uppercase;
+      margin-right: 10px;
     }
     
-    .income .transaction-amount {
-      color: #2ecc71;
+    .type-income {
+      background-color: rgba(46, 204, 113, 0.1);
+      color: var(--success);
     }
     
-    .expense .transaction-amount {
-      color: #e74c3c;
+    .type-expense {
+      background-color: rgba(231, 76, 60, 0.1);
+      color: var(--danger);
+    }
+    
+    .transaction-category {
+      color: var(--gray);
+      font-size: 14px;
+    }
+    
+    .transaction-description {
+      margin: 5px 0;
     }
     
     .transaction-comments {
       font-style: italic;
-      color: #7f8c8d;
-      margin-top: 10px;
+      color: var(--gray);
+      font-size: 14px;
     }
     
-    #summary-section {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
+    .transaction-amount {
+      font-weight: bold;
+      margin-left: 15px;
     }
     
-    .summary-card {
-      padding: 15px;
+    .amount-income {
+      color: var(--success);
+    }
+    
+    .amount-expense {
+      color: var(--danger);
+    }
+    
+    .transaction-date {
+      font-size: 12px;
+      color: var(--gray);
+    }
+    
+    /* Animal Feed Section */
+    .feed-section {
       background: white;
       border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    .income {
-      color: #2ecc71;
-    }
-    
-    .expense {
-      color: #e74c3c;
-    }
-    
-    #username-display {
-      font-size: 1.2em;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       margin-bottom: 20px;
-      color: #2c3e50;
     }
     
+    .feed-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .feed-item {
+      background: #f9f9f9;
+      border-radius: 8px;
+      padding: 15px;
+    }
+    
+    /* Responsive */
     @media (max-width: 768px) {
-      #summary-section {
+      .form-row {
         grid-template-columns: 1fr;
       }
+      
+      .transaction-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .transaction-amount {
+        margin-left: 0;
+        margin-top: 10px;
+      }
+    }
+    
+    /* Utility Classes */
+    .text-center {
+      text-align: center;
+    }
+    
+    .text-success {
+      color: var(--success);
+    }
+    
+    .text-danger {
+      color: var(--danger);
+    }
+    
+    .mt-3 {
+      margin-top: 15px;
+    }
+    
+    .mb-3 {
+      margin-bottom: 15px;
+    }
+    
+    .hidden {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <h1>Control Avícola</h1>
-  
-  <section id="auth-section">
-    <h2>Registro</h2>
-    <form id="register-form" class="auth-form">
-      <div>
-        <label for="register-username">Nombre de usuario</label>
-        <input type="text" id="register-username" required>
+  <div class="container">
+    <!-- Auth Section -->
+    <div id="auth-section" class="auth-container">
+      <div class="auth-tabs">
+        <div class="auth-tab active" onclick="switchAuthTab('login')">Iniciar Sesión</div>
+        <div class="auth-tab" onclick="switchAuthTab('register')">Registrarse</div>
       </div>
-      <div>
-        <label for="register-email">Correo electrónico</label>
-        <input type="email" id="register-email" required>
-      </div>
-      <div>
-        <label for="register-password">Contraseña</label>
-        <input type="password" id="register-password" required>
-      </div>
-      <button type="submit">Registrarse</button>
-    </form>
+      
+      <form id="login-form" class="auth-form active">
+        <div class="form-group">
+          <label for="login-email">Correo Electrónico</label>
+          <input type="email" id="login-email" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="login-password">Contraseña</label>
+          <input type="password" id="login-password" class="form-control" required>
+        </div>
+        <button type="button" class="btn btn-block" onclick="loginUser()">Ingresar</button>
+      </form>
+      
+      <form id="register-form" class="auth-form">
+        <div class="form-group">
+          <label for="register-name">Nombre Completo</label>
+          <input type="text" id="register-name" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="register-email">Correo Electrónico</label>
+          <input type="email" id="register-email" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="register-password">Contraseña</label>
+          <input type="password" id="register-password" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="register-confirm">Confirmar Contraseña</label>
+          <input type="password" id="register-confirm" class="form-control" required>
+        </div>
+        <button type="button" class="btn btn-block" onclick="registerUser()">Registrarse</button>
+      </form>
+    </div>
     
-    <h2>Iniciar Sesión</h2>
-    <form id="login-form" class="auth-form">
-      <div>
-        <label for="login-email">Correo electrónico</label>
-        <input type="email" id="login-email" required>
-      </div>
-      <div>
-        <label for="login-password">Contraseña</label>
-        <input type="password" id="login-password" required>
-      </div>
-      <button type="submit">Iniciar Sesión</button>
-    </form>
-  </section>
-  
-  <section id="app-section" style="display: none;">
-    <div id="username-display"></div>
-    <button id="logout-btn">Cerrar Sesión</button>
-    
-    <section id="summary-section"></section>
-    
-    <h2>Registrar Transacción</h2>
-    <form id="transaction-form">
-      <div>
-        <label for="transaction-type">Tipo</label>
-        <select id="transaction-type" required>
-          <option value="">Seleccionar...</option>
-          <option value="income">Ingreso</option>
-          <option value="expense">Gasto</option>
-        </select>
-      </div>
+    <!-- App Section -->
+    <div id="app-section" class="hidden">
+      <header>
+        <div class="logo">Control Avícola</div>
+        <div class="user-info">
+          <span id="user-name"></span>
+          <button class="btn btn-danger" onclick="logout()">Cerrar Sesión</button>
+        </div>
+      </header>
       
-      <div>
-        <label for="transaction-category">Categoría</label>
-        <select id="transaction-category" required>
-          <option value="">Seleccionar...</option>
-          <optgroup label="Ingresos">
-            <option value="venta_pollos">Venta de pollos</option>
-            <option value="venta_huevos">Venta de huevos</option>
-            <option value="otros_ingresos">Otros ingresos</option>
-          </optgroup>
-          <optgroup label="Gastos">
-            <option value="alimento">Alimento</option>
-            <option value="medicina">Medicina/Vacunas</option>
-            <option value="equipo">Equipo/Infraestructura</option>
-            <option value="mano_obra">Mano de obra</option>
-            <option value="otros_gastos">Otros gastos</option>
-          </optgroup>
-        </select>
-      </div>
-      
-      <div>
-        <label for="transaction-amount">Monto</label>
-        <input type="number" id="transaction-amount" min="0" step="0.01" required>
-      </div>
-      
-      <div>
-        <label for="transaction-description">Descripción</label>
-        <input type="text" id="transaction-description" required>
-      </div>
-      
-      <div>
-        <label for="transaction-comments">Comentarios (opcional)</label>
-        <textarea id="transaction-comments"></textarea>
-      </div>
-      
-      <button type="submit">Guardar Transacción</button>
-    </form>
-    
-    <h2>Historial de Transacciones</h2>
-    <div id="transactions-list"></div>
-  </section>
-
-  <script type="module" src="app.js"></script>
+      <!-- Dashboard -->
+      <section id="dashboard-section" class="app-section active">
+        <div class="dashboard-cards">
+          <div class="card">
+            <h3>Ingresos Totales</h3>
+            <div class="card-value income-value" id="total-income">$0.00</div>
+            <p>Este mes</p>
+          </div>
+          <div class="card">
+            <h3>Gastos Totales</h3>
+            <div class="card-value expense-value" id="total-expense">$0.00</div>
+            <p>Este mes</p>
+          </div>
+          <div class="card">
+            <h3>Balance</h3>
+            <div class="card-value balance-value" id="total-balance">$0.00</div>
+            <p>Este mes</p>
+          </div>
+          <div class="card">
+            <h3>Balanceado</h3>
+            <div class="card-value" id="total-feed">0 kg</div>
+            <p>Comprado este mes</p>
+          </div>
+        </div>
+        
+        <!-- Transaction Form -->
+        <div class="transaction-form">
+          <h3>Registrar Transacción</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="transaction-type">Tipo</label>
+              <select id="transaction-type" class="form-control" required>
+                <option value="">Seleccionar...</option>
+                <option value="income">Ingreso</option>
+                <option value="expense">Gasto</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="transaction-category">Categoría</label>
+              <select id="transaction-category" class="form-control" required>
+                <option value="">Seleccionar...</option>
+                <optgroup label="Ingresos">
+                  <option value="venta_pollos">Venta de Pollos</option>
+                  <option value="venta_huevos">Venta de Huevos</option>
+                  <option value="subsidios">Subsidios</option>
+                </optgroup>
+                <optgroup label="Gastos">
+                  <option value="balanceado">Balanceado</option>
+                  <option value="medicinas">Medicinas</option>
+                  <option value="vacunas">Vacunas</option>
+                  <option value="mano_obra">Mano de Obra</option>
+                  <option value="equipos">Equipos</option>
+                </optgroup>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="transaction-amount">Monto (USD)</label>
+              <input type="number" id="transaction-amount" class="form-control" min="0" step="0.01" required>
+            </div>
+            <div class="form-group">
+              <label for="transaction-quantity">Cantidad (kg para balanceado)</label>
+              <input type="number" id="transaction-quantity" class="form-control" min="0" step="0.1">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="transaction-description">Descripción</label>
+            <input type="text" id="transaction-description" class="form-control" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="transaction-comments">Comentarios</label>
+            <textarea id="transaction-comments" class="form-control" rows="3"></textarea>
+          </div>
+          
+          <button type="button" class="btn btn-success" onclick="addTransaction()">Guardar Transacción</button>
+        </div>
+        
+        <!-- Transactions List -->
+        <h3>Historial de Transacciones</h3>
+        <div class="transactions-list" id="transactions-container">
+          <!-- Las transacciones se cargarán aquí -->
+        </div>
+      </section>
+    </div>
+  </div>
 
   <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyD3MI1klgBSHs1h6QT4VPNoScCfCwMV_Ck",
+      authDomain: "usuario-b0384.firebaseapp.com",
+      databaseURL: "https://usuario-b0384-default-rtdb.firebaseio.com",
+      projectId: "usuario-b0384",
+      storageBucket: "usuario-b0384.appspot.com",
+      messagingSenderId: "196266170863",
+      appId: "1:196266170863:web:4ea57f489df94aba94fe1a"
+    };
 
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const database = firebase.database();
 
-    import { initializeApp } from "firebase/app";
-import { 
-  getAuth, 
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  onAuthStateChanged,
-  signOut
-} from "firebase/auth";
-import { 
-  getDatabase, 
-  ref, 
-  push, 
-  onValue, 
-  remove,
-  update
-} from "firebase/database";
-
-// Configuración de Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyD3MI1klgBSHs1h6QT4VPNoScCfCwMV_Ck",
-  authDomain: "usuario-b0384.firebaseapp.com",
-  databaseURL: "https://usuario-b0384-default-rtdb.firebaseio.com",
-  projectId: "usuario-b0384",
-  storageBucket: "usuario-b0384.appspot.com",
-  messagingSenderId: "196266170863",
-  appId: "1:196266170863:web:4ea57f489df94aba94fe1a"
-};
-
-// Inicializar Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const database = getDatabase(app);
-
-// Elementos del DOM
-const registerForm = document.getElementById('register-form');
-const loginForm = document.getElementById('login-form');
-const transactionForm = document.getElementById('transaction-form');
-const transactionsList = document.getElementById('transactions-list');
-const authSection = document.getElementById('auth-section');
-const appSection = document.getElementById('app-section');
-const logoutBtn = document.getElementById('logout-btn');
-const summarySection = document.getElementById('summary-section');
-const usernameDisplay = document.getElementById('username-display');
-
-// Registrar nuevo usuario
-registerForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const email = registerForm['register-email'].value;
-  const password = registerForm['register-password'].value;
-  const username = registerForm['register-username'].value;
-  
-  createUserWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      // Guardar nombre de usuario en la base de datos
-      const userRef = ref(database, `users/${userCredential.user.uid}/info`);
-      update(userRef, {
-        username: username
-      }).then(() => {
-        registerForm.reset();
-        alert('Usuario registrado con éxito');
-      });
-    })
-    .catch((error) => {
-      alert(error.message);
-    });
-});
-
-// Iniciar sesión
-loginForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const email = loginForm['login-email'].value;
-  const password = loginForm['login-password'].value;
-  
-  signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      loginForm.reset();
-    })
-    .catch((error) => {
-      alert(error.message);
-    });
-});
-
-// Cerrar sesión
-logoutBtn.addEventListener('click', () => {
-  signOut(auth).catch((error) => {
-    alert(error.message);
-  });
-});
-
-// Agregar nueva transacción (gasto/ingreso)
-transactionForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const type = transactionForm['transaction-type'].value;
-  const category = transactionForm['transaction-category'].value;
-  const amount = parseFloat(transactionForm['transaction-amount'].value);
-  const description = transactionForm['transaction-description'].value;
-  const comments = transactionForm['transaction-comments'].value;
-  
-  if (auth.currentUser) {
-    const transactionsRef = ref(database, `users/${auth.currentUser.uid}/transactions`);
-    push(transactionsRef, {
-      type,
-      category,
-      amount,
-      description,
-      comments,
-      date: new Date().toISOString()
-    }).then(() => {
-      transactionForm.reset();
-    });
-  }
-});
-
-// Observar cambios de autenticación
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    // Usuario autenticado
-    authSection.style.display = 'none';
-    appSection.style.display = 'block';
+    // DOM Elements
+    const authSection = document.getElementById('auth-section');
+    const appSection = document.getElementById('app-section');
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const userNameDisplay = document.getElementById('user-name');
     
-    // Cargar nombre de usuario
-    const userRef = ref(database, `users/${user.uid}/info`);
-    onValue(userRef, (snapshot) => {
-      if (snapshot.exists() && snapshot.val().username) {
-        usernameDisplay.textContent = snapshot.val().username;
+    // Auth State Listener
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        // User is signed in
+        authSection.classList.add('hidden');
+        appSection.classList.remove('hidden');
+        
+        // Load user data
+        loadUserData(user.uid);
+        // Load transactions
+        loadTransactions(user.uid);
+      } else {
+        // User is signed out
+        authSection.classList.remove('hidden');
+        appSection.classList.add('hidden');
       }
     });
-    
-    loadTransactions(user.uid);
-    loadSummary(user.uid);
-  } else {
-    // Usuario no autenticado
-    authSection.style.display = 'block';
-    appSection.style.display = 'none';
-  }
-});
 
-// Cargar transacciones
-function loadTransactions(userId) {
-  const transactionsRef = ref(database, `users/${userId}/transactions`);
-  
-  onValue(transactionsRef, (snapshot) => {
-    transactionsList.innerHTML = '';
-    
-    if (snapshot.exists()) {
-      // Convertir a array y ordenar por fecha
-      const transactions = [];
-      snapshot.forEach((childSnapshot) => {
-        transactions.push({
-          id: childSnapshot.key,
-          ...childSnapshot.val()
-        });
-      });
+    // Switch between login and register tabs
+    function switchAuthTab(tab) {
+      const tabs = document.querySelectorAll('.auth-tab');
+      const forms = document.querySelectorAll('.auth-form');
       
-      transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+      tabs.forEach(t => t.classList.remove('active'));
+      forms.forEach(f => f.classList.remove('active'));
       
-      // Mostrar transacciones
-      transactions.forEach((transaction) => {
-        const transactionItem = document.createElement('div');
-        transactionItem.className = `transaction-item ${transaction.type}`;
-        transactionItem.innerHTML = `
-          <div class="transaction-header">
-            <span class="transaction-date">${formatDate(transaction.date)}</span>
-            <span class="transaction-category">${transaction.category}</span>
-            <span class="transaction-amount">${transaction.type === 'income' ? '+' : '-'}$${transaction.amount.toFixed(2)}</span>
-          </div>
-          <div class="transaction-body">
-            <p class="transaction-description">${transaction.description}</p>
-            ${transaction.comments ? `<p class="transaction-comments"><strong>Comentarios:</strong> ${transaction.comments}</p>` : ''}
-          </div>
-          <button class="delete-btn" data-id="${transaction.id}">Eliminar</button>
-        `;
-        transactionsList.appendChild(transactionItem);
-      });
-      
-      // Agregar eventos para eliminar
-      document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const transactionId = e.target.getAttribute('data-id');
-          const transactionRef = ref(database, `users/${userId}/transactions/${transactionId}`);
-          remove(transactionRef);
-        });
-      });
-    } else {
-      transactionsList.innerHTML = '<p>No hay transacciones registradas</p>';
+      if (tab === 'login') {
+        document.querySelector('.auth-tab:nth-child(1)').classList.add('active');
+        loginForm.classList.add('active');
+      } else {
+        document.querySelector('.auth-tab:nth-child(2)').classList.add('active');
+        registerForm.classList.add('active');
+      }
     }
-  });
-}
 
-// Cargar resumen
-function loadSummary(userId) {
-  const transactionsRef = ref(database, `users/${userId}/transactions`);
-  
-  onValue(transactionsRef, (snapshot) => {
-    let totalIncome = 0;
-    let totalExpense = 0;
-    let chickenCount = 0;
-    let foodExpense = 0;
-    let medicineExpense = 0;
-    
-    if (snapshot.exists()) {
-      snapshot.forEach((childSnapshot) => {
-        const transaction = childSnapshot.val();
-        
-        if (transaction.type === 'income') {
-          totalIncome += transaction.amount;
-          if (transaction.category === 'venta_pollos') {
-            chickenCount += transaction.amount; // Asumiendo que amount es cantidad de pollos
-          }
-        } else {
-          totalExpense += transaction.amount;
-          if (transaction.category === 'alimento') {
-            foodExpense += transaction.amount;
-          } else if (transaction.category === 'medicina') {
-            medicineExpense += transaction.amount;
-          }
+    // Register new user
+    function registerUser() {
+      const email = document.getElementById('register-email').value;
+      const password = document.getElementById('register-password').value;
+      const confirmPassword = document.getElementById('register-confirm').value;
+      const name = document.getElementById('register-name').value;
+      
+      if (password !== confirmPassword) {
+        alert('Las contraseñas no coinciden');
+        return;
+      }
+      
+      auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          // Save additional user info
+          const userRef = database.ref('users/' + userCredential.user.uid + '/info');
+          userRef.set({
+            name: name,
+            email: email,
+            createdAt: new Date().toISOString()
+          }).then(() => {
+            alert('Registro exitoso!');
+            switchAuthTab('login');
+            registerForm.reset();
+          });
+        })
+        .catch((error) => {
+          alert(error.message);
+        });
+    }
+
+    // Login user
+    function loginUser() {
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      
+      auth.signInWithEmailAndPassword(email, password)
+        .catch((error) => {
+          alert(error.message);
+        });
+    }
+
+    // Logout user
+    function logout() {
+      auth.signOut();
+    }
+
+    // Load user data
+    function loadUserData(userId) {
+      const userRef = database.ref('users/' + userId + '/info');
+      
+      userRef.on('value', (snapshot) => {
+        const userData = snapshot.val();
+        if (userData && userData.name) {
+          userNameDisplay.textContent = userData.name;
         }
       });
     }
-    
-    const profit = totalIncome - totalExpense;
-    
-    summarySection.innerHTML = `
-      <div class="summary-card">
-        <h3>Resumen Financiero</h3>
-        <p>Ingresos: <span class="income">+$${totalIncome.toFixed(2)}</span></p>
-        <p>Gastos: <span class="expense">-$${totalExpense.toFixed(2)}</span></p>
-        <p>Balance: <span class="${profit >= 0 ? 'income' : 'expense'}">$${profit.toFixed(2)}</span></p>
-      </div>
-      <div class="summary-card">
-        <h3>Resumen Avícola</h3>
-        <p>Pollos vendidos: ${chickenCount}</p>
-        <p>Gasto en alimento: $${foodExpense.toFixed(2)}</p>
-        <p>Gasto en medicina: $${medicineExpense.toFixed(2)}</p>
-      </div>
-    `;
-  });
-}
 
-// Formatear fecha
-function formatDate(dateString) {
-  const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-  return new Date(dateString).toLocaleDateString('es-ES', options);
-}
+    // Add new transaction
+    function addTransaction() {
+      const type = document.getElementById('transaction-type').value;
+      const category = document.getElementById('transaction-category').value;
+      const amount = parseFloat(document.getElementById('transaction-amount').value);
+      const quantity = parseFloat(document.getElementById('transaction-quantity').value) || 0;
+      const description = document.getElementById('transaction-description').value;
+      const comments = document.getElementById('transaction-comments').value;
+      
+      if (!type || !category || !amount || !description) {
+        alert('Por favor complete todos los campos requeridos');
+        return;
+      }
+      
+      const user = auth.currentUser;
+      if (user) {
+        const transactionRef = database.ref('users/' + user.uid + '/transactions');
+        const newTransaction = {
+          type: type,
+          category: category,
+          amount: amount,
+          quantity: category === 'balanceado' ? quantity : null,
+          description: description,
+          comments: comments,
+          date: new Date().toISOString()
+        };
+        
+        transactionRef.push(newTransaction)
+          .then(() => {
+            // Clear form
+            document.getElementById('transaction-form').reset();
+          })
+          .catch((error) => {
+            alert('Error al guardar: ' + error.message);
+          });
+      }
+    }
+
+    // Load transactions
+    function loadTransactions(userId) {
+      const transactionsRef = database.ref('users/' + userId + '/transactions');
+      const transactionsContainer = document.getElementById('transactions-container');
+      
+      transactionsRef.on('value', (snapshot) => {
+        transactionsContainer.innerHTML = '';
+        let totalIncome = 0;
+        let totalExpense = 0;
+        let totalFeed = 0;
+        
+        if (snapshot.exists()) {
+          // Convert to array and sort by date (newest first)
+          const transactions = [];
+          snapshot.forEach((childSnapshot) => {
+            transactions.push({
+              id: childSnapshot.key,
+              ...childSnapshot.val()
+            });
+          });
+          
+          transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+          
+          // Display transactions and calculate totals
+          transactions.forEach((transaction) => {
+            const transactionElement = document.createElement('div');
+            transactionElement.className = 'transaction-item';
+            
+            if (transaction.type === 'income') {
+              totalIncome += transaction.amount;
+            } else {
+              totalExpense += transaction.amount;
+              if (transaction.category === 'balanceado' && transaction.quantity) {
+                totalFeed += transaction.quantity;
+              }
+            }
+            
+            transactionElement.innerHTML = `
+              <div class="transaction-details">
+                <div>
+                  <span class="transaction-type type-${transaction.type}">${transaction.type === 'income' ? 'Ingreso' : 'Gasto'}</span>
+                  <span class="transaction-category">${formatCategory(transaction.category)}</span>
+                </div>
+                <div class="transaction-description">${transaction.description}</div>
+                ${transaction.comments ? `<div class="transaction-comments">${transaction.comments}</div>` : ''}
+                ${transaction.quantity ? `<div class="transaction-quantity">Cantidad: ${transaction.quantity} kg</div>` : ''}
+                <div class="transaction-date">${formatDate(transaction.date)}</div>
+              </div>
+              <div class="transaction-amount amount-${transaction.type}">
+                ${transaction.type === 'income' ? '+' : '-'}$${transaction.amount.toFixed(2)}
+              </div>
+            `;
+            
+            transactionsContainer.appendChild(transactionElement);
+          });
+        } else {
+          transactionsContainer.innerHTML = '<div class="transaction-item text-center">No hay transacciones registradas</div>';
+        }
+        
+        // Update totals
+        document.getElementById('total-income').textContent = '$' + totalIncome.toFixed(2);
+        document.getElementById('total-expense').textContent = '$' + totalExpense.toFixed(2);
+        document.getElementById('total-balance').textContent = '$' + (totalIncome - totalExpense).toFixed(2);
+        document.getElementById('total-feed').textContent = totalFeed.toFixed(1) + ' kg';
+      });
+    }
+
+    // Helper function to format category
+    function formatCategory(category) {
+      const categories = {
+        'venta_pollos': 'Venta de Pollos',
+        'venta_huevos': 'Venta de Huevos',
+        'subsidios': 'Subsidios',
+        'balanceado': 'Balanceado',
+        'medicinas': 'Medicinas',
+        'vacunas': 'Vacunas',
+        'mano_obra': 'Mano de Obra',
+        'equipos': 'Equipos'
+      };
+      return categories[category] || category;
+    }
+
+    // Helper function to format date
+    function formatDate(dateString) {
+      const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+      return new Date(dateString).toLocaleDateString('es-ES', options);
+    }
   </script>
 </body>
 </html>
