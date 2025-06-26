@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galería Cloudinary Mejorada</title>
+    <title>Galería Compartida Cloudinary</title>
     <style>
         :root {
             --primary: #4361ee;
@@ -144,7 +144,7 @@
         
         .gallery {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 2rem;
             margin-top: 3rem;
         }
@@ -166,7 +166,7 @@
         
         .gallery-img {
             width: 100%;
-            height: 350px;
+            height: 250px;
             object-fit: cover;
             display: block;
             transition: transform 0.3s;
@@ -177,7 +177,14 @@
         }
         
         .gallery-info {
-            padding: 1.5rem;
+            padding: 1rem;
+        }
+        
+        .gallery-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #6c757d;
         }
         
         .gallery-url {
@@ -287,12 +294,31 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            font-size: 1.2rem;
+            color: var(--dark);
+        }
+        
+        .loading i {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>Galería Cloudinary Mejorada</h1>
+        <h1>Galería Compartida</h1>
         
         <div class="upload-section">
             <div class="file-upload" id="dropArea">
@@ -312,8 +338,11 @@
             <div id="statusMessage" class="status"></div>
         </div>
         
-        <div class="gallery" id="gallery">
-            <!-- Las imágenes se cargarán aquí -->
+        <div id="gallery-container">
+            <div class="loading" id="loading">
+                <i class="fas fa-spinner"></i> Cargando galería...
+            </div>
+            <div class="gallery" id="gallery"></div>
         </div>
     </div>
 
@@ -326,10 +355,23 @@
     </div>
 
     <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDzY4v5JXq3nQ9Q9Q9Q9Q9Q9Q9Q9Q9Q9Q9Q",
+            authDomain: "tu-proyecto.firebaseapp.com",
+            projectId: "tu-proyecto",
+            storageBucket: "tu-proyecto.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:9Q9Q9Q9Q9Q9Q9Q9Q9Q9Q9"
+        };
+        
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        
         // Configuración de Cloudinary
-        const cloudName = 'dba9d8';
-        const apiKey = '528757166221984';
-        const unsignedUploadPreset = 'web_upload';
+        const cloudName = 'tu_cloud_name';
+        const uploadPreset = 'tu_upload_preset';
         
         // Elementos del DOM
         const fileInput = document.getElementById('fileInput');
@@ -340,51 +382,51 @@
         const progressBar = document.getElementById('progressBar');
         const statusMessage = document.getElementById('statusMessage');
         const gallery = document.getElementById('gallery');
+        const loading = document.getElementById('loading');
         const modal = document.getElementById('imageModal');
         const expandedImg = document.getElementById('expandedImg');
         const closeBtn = document.querySelector('.close');
         
         // Cargar imágenes al iniciar
         document.addEventListener('DOMContentLoaded', () => {
-            loadImagesFromStorage();
             setupEventListeners();
+            loadGallery();
         });
         
-        function loadImagesFromStorage() {
-            const savedImages = JSON.parse(localStorage.getItem('cloudinary_images')) || [];
-            savedImages.forEach(img => {
-                // Asegúrate de que el objeto tenga todas las propiedades necesarias
-                const imageData = {
-                    secure_url: img.secure_url,
-                    bytes: img.bytes,
-                    public_id: img.public_id || 'Imagen subida'
-                };
-                createGalleryItem(imageData);
+        // Cargar galería desde Firestore
+        function loadGallery() {
+            db.collection('images').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
+                gallery.innerHTML = '';
+                
+                if (snapshot.empty) {
+                    loading.innerHTML = '<p>No hay imágenes en la galería todavía.</p>';
+                    return;
+                }
+                
+                snapshot.forEach(doc => {
+                    const imgData = doc.data();
+                    createGalleryItem(imgData);
+                });
+                
+                loading.style.display = 'none';
+                gallery.style.display = 'grid';
+            }, error => {
+                console.error("Error cargando imágenes:", error);
+                loading.innerHTML = '<p>Error al cargar la galería. Intenta recargar la página.</p>';
             });
-        }
-        
-        function saveImageToStorage(imageData) {
-            const savedImages = JSON.parse(localStorage.getItem('cloudinary_images')) || [];
-            
-            // Guarda solo los datos necesarios
-            const imageToSave = {
-                secure_url: imageData.secure_url,
-                bytes: imageData.bytes,
-                public_id: imageData.public_id || 'Imagen subida'
-            };
-            
-            savedImages.push(imageToSave);
-            localStorage.setItem('cloudinary_images', JSON.stringify(savedImages));
         }
         
         function createGalleryItem(imgData) {
             const galleryItem = document.createElement('div');
             galleryItem.className = 'gallery-item';
             galleryItem.innerHTML = `
-                <img src="${imgData.secure_url}" alt="Imagen subida" class="gallery-img">
+                <img src="${imgData.secure_url}" alt="Imagen compartida" class="gallery-img">
                 <div class="gallery-info">
-                    <p><strong>Tamaño:</strong> ${(imgData.bytes/1024).toFixed(1)} KB</p>
-                    <p class="gallery-url">${imgData.public_id}</p>
+                    <div class="gallery-meta">
+                        <span><i class="fas fa-user"></i> ${imgData.uploadedBy || 'Anónimo'}</span>
+                        <span><i class="fas fa-calendar-alt"></i> ${new Date(imgData.timestamp).toLocaleDateString()}</span>
+                    </div>
+                    <p class="gallery-url">${imgData.public_id || 'Imagen compartida'}</p>
                 </div>
                 <button class="copy-btn" title="Copiar URL" data-url="${imgData.secure_url}">
                     <i class="fas fa-copy"></i>
@@ -491,29 +533,48 @@
             uploadBtn.innerHTML = 'Subiendo... <i class="fas fa-spinner fa-spin"></i>';
             progressContainer.style.display = 'block';
             
+            // Subir a Cloudinary
             const formData = new FormData();
             formData.append('file', file);
-            formData.append('upload_preset', unsignedUploadPreset);
-            formData.append('cloud_name', cloudName);
-            formData.append('api_key', apiKey);
+            formData.append('upload_preset', uploadPreset);
             
             try {
-                const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-                    method: 'POST',
-                    body: formData
+                // Mostrar progreso de carga
+                const xhr = new XMLHttpRequest();
+                xhr.upload.addEventListener('progress', (e) => {
+                    if (e.lengthComputable) {
+                        const percentComplete = Math.round((e.loaded / e.total) * 100);
+                        progressBar.style.width = percentComplete + '%';
+                    }
                 });
                 
-                const data = await response.json();
+                const cloudinaryResponse = await new Promise((resolve, reject) => {
+                    xhr.open('POST', `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`);
+                    xhr.onload = () => {
+                        if (xhr.status === 200) {
+                            resolve(JSON.parse(xhr.responseText));
+                        } else {
+                            reject(new Error('Error al subir la imagen'));
+                        }
+                    };
+                    xhr.onerror = () => reject(new Error('Error de conexión'));
+                    xhr.send(formData);
+                });
                 
-                if (!response.ok) {
-                    throw new Error(data.error.message || 'Error al subir la imagen');
-                }
+                // Guardar en Firestore
+                await db.collection('images').add({
+                    secure_url: cloudinaryResponse.secure_url,
+                    public_id: cloudinaryResponse.public_id,
+                    bytes: cloudinaryResponse.bytes,
+                    format: cloudinaryResponse.format,
+                    uploadedBy: 'Usuario Actual', // Puedes implementar autenticación para obtener el nombre real
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
                 
-                showStatus('¡Imagen subida con éxito!', 'success');
-                saveImageToStorage(data);
-                createGalleryItem(data);
+                showStatus('¡Imagen compartida con éxito!', 'success');
                 resetUploadForm();
             } catch (error) {
+                console.error("Error al subir:", error);
                 showStatus(`Error: ${error.message}`, 'error');
             } finally {
                 uploadBtn.disabled = false;
