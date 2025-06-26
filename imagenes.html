@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PorciControl Pro | Gestión Porcina</title>
+  <title>Avicontrol Pro | Gestión Avícola</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
@@ -23,8 +22,6 @@
       --future-purple: #6C5CE7;
       --glass: rgba(255, 255, 255, 0.15);
       --glass-border: rgba(255, 255, 255, 0.2);
-      --pig-pink: #FF9FF3;
-      --pig-dark: #5F27CD;
     }
     
     * {
@@ -35,7 +32,7 @@
     
     body {
       font-family: 'Roboto', sans-serif;
-      background: linear-gradient(135deg, #1a1a2e 0%, #2C3A47 100%);
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
       color: white;
       min-height: 100vh;
       line-height: 1.6;
@@ -43,7 +40,7 @@
     }
     
     .container {
-      max-width: 1400px;
+      max-width: 1200px;
       margin: 0 auto;
       padding: 20px;
     }
@@ -60,16 +57,16 @@
       margin-bottom: 30px;
       border: 1px solid var(--glass-border);
       box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
-      background: linear-gradient(90deg, var(--pig-dark), var(--pig-pink));
     }
     
     .logo {
       font-family: 'Orbitron', sans-serif;
       font-weight: 700;
       font-size: 24px;
-      color: white;
+      background: linear-gradient(to right, var(--future-blue), var(--future-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
       letter-spacing: 1px;
-      text-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
     
     .user-info {
@@ -107,16 +104,15 @@
       transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
       position: relative;
       overflow: hidden;
-      background: rgba(255, 255, 255, 0.1);
     }
     
     .auth-tab.active {
-      background: rgba(108, 92, 231, 0.3);
+      background: rgba(108, 92, 231, 0.2);
       color: white;
     }
     
     .auth-tab:not(.active):hover {
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.05);
     }
     
     .auth-tab::after {
@@ -127,7 +123,7 @@
       transform: translateX(-50%);
       width: 0;
       height: 3px;
-      background: linear-gradient(to right, var(--pig-pink), var(--pig-dark));
+      background: linear-gradient(to right, var(--future-blue), var(--future-purple));
       transition: width 0.3s ease;
     }
     
@@ -175,8 +171,8 @@
     
     .form-control:focus {
       outline: none;
-      border-color: var(--pig-pink);
-      box-shadow: 0 0 0 2px rgba(255, 159, 243, 0.3);
+      border-color: var(--future-blue);
+      box-shadow: 0 0 0 2px rgba(0, 206, 201, 0.3);
       background: rgba(255, 255, 255, 0.15);
     }
     
@@ -200,23 +196,14 @@
     }
     
     .btn-primary {
-      background: linear-gradient(45deg, var(--pig-pink), var(--pig-dark));
+      background: linear-gradient(45deg, var(--future-blue), var(--future-purple));
       color: white;
-      box-shadow: 0 4px 15px rgba(95, 39, 205, 0.4);
+      box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
     }
     
     .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(95, 39, 205, 0.6);
-    }
-    
-    .btn-success {
-      background: var(--success);
-      color: white;
-    }
-    
-    .btn-success:hover {
-      background: #00a884;
+      box-shadow: 0 6px 20px rgba(108, 92, 231, 0.6);
     }
     
     .btn-danger {
@@ -226,15 +213,6 @@
     
     .btn-danger:hover {
       background: #c0392b;
-    }
-    
-    .btn-warning {
-      background: var(--warning);
-      color: var(--dark);
-    }
-    
-    .btn-warning:hover {
-      background: #f6b93b;
     }
     
     /* App Section */
@@ -293,138 +271,15 @@
     }
     
     .balance-value {
-      color: var(--pig-pink);
+      color: var(--future-blue);
     }
     
-    .pigs-value {
+    .feed-value {
       color: var(--warning);
     }
     
-    /* Batch Selector */
-    .batch-selector {
-      display: flex;
-      gap: 15px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-    
-    .batch-card {
-      background: var(--glass);
-      backdrop-filter: blur(10px);
-      border-radius: 12px;
-      padding: 15px;
-      border: 1px solid var(--glass-border);
-      cursor: pointer;
-      transition: all 0.3s ease;
-      min-width: 180px;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .batch-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 5px;
-      height: 100%;
-      background: linear-gradient(to bottom, var(--pig-pink), var(--pig-dark));
-    }
-    
-    .batch-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-    
-    .batch-card.active {
-      background: rgba(255, 159, 243, 0.2);
-      border-color: var(--pig-pink);
-    }
-    
-    .batch-card h4 {
-      margin-bottom: 5px;
-      color: white;
-    }
-    
-    .batch-card p {
-      font-size: 14px;
-      color: rgba(255, 255, 255, 0.7);
-    }
-    
-    .add-batch-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px dashed rgba(255, 255, 255, 0.3);
-      color: rgba(255, 255, 255, 0.7);
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    
-    .add-batch-btn:hover {
-      background: rgba(255, 255, 255, 0.2);
-      color: white;
-    }
-    
-    /* New Batch Modal */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.7);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(5px);
-    }
-    
-    .modal-content {
-      background: linear-gradient(135deg, #2C3A47 0%, #1a1a2e 100%);
-      padding: 30px;
-      border-radius: 20px;
-      width: 90%;
-      max-width: 500px;
-      border: 1px solid var(--pig-pink);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-      animation: modalFadeIn 0.4s ease-out;
-    }
-    
-    @keyframes modalFadeIn {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    
-    .modal-header h3 {
-      color: white;
-      font-size: 22px;
-    }
-    
-    .close-modal {
-      background: none;
-      border: none;
-      color: rgba(255, 255, 255, 0.6);
-      font-size: 24px;
-      cursor: pointer;
-      transition: color 0.3s ease;
-    }
-    
-    .close-modal:hover {
-      color: var(--pig-pink);
-    }
-    
-    /* Pig Form */
-    .pig-form {
+    /* Transaction Form */
+    .transaction-form {
       background: var(--glass);
       backdrop-filter: blur(10px);
       border-radius: 20px;
@@ -434,7 +289,7 @@
       box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
     }
     
-    .pig-form h3 {
+    .transaction-form h3 {
       margin-bottom: 20px;
       font-size: 20px;
       color: white;
@@ -442,14 +297,14 @@
       padding-bottom: 10px;
     }
     
-    .pig-form h3::after {
+    .transaction-form h3::after {
       content: '';
       position: absolute;
       bottom: 0;
       left: 0;
       width: 50px;
       height: 3px;
-      background: linear-gradient(to right, var(--pig-pink), var(--pig-dark));
+      background: linear-gradient(to right, var(--future-blue), var(--future-purple));
       border-radius: 3px;
     }
     
@@ -460,50 +315,149 @@
       margin-bottom: 20px;
     }
     
-    /* Pigs Table */
-    .pigs-table-container {
+    /* Transactions Layout */
+    .transactions-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    
+    .transactions-column {
       background: var(--glass);
       backdrop-filter: blur(10px);
       border-radius: 20px;
       padding: 20px;
       border: 1px solid var(--glass-border);
       box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
-      overflow-x: auto;
     }
     
-    table {
-      width: 100%;
-      border-collapse: collapse;
+    .transactions-column h3 {
+      margin-bottom: 20px;
+      font-size: 18px;
+      color: white;
+      display: flex;
+      align-items: center;
+    }
+    
+    .transactions-column h3::before {
+      content: '';
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+    
+    .income-column h3::before {
+      background: var(--success);
+    }
+    
+    .expense-column h3::before {
+      background: var(--danger);
+    }
+    
+    .transactions-list {
+      max-height: 500px;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+    
+    /* Custom scrollbar */
+    .transactions-list::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .transactions-list::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+    }
+    
+    .transactions-list::-webkit-scrollbar-thumb {
+      background: linear-gradient(var(--future-blue), var(--future-purple));
+      border-radius: 10px;
+    }
+    
+    /* Transaction Item */
+    .transaction-item {
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .transaction-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateX(5px);
+    }
+    
+    .transaction-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+    }
+    
+    .income-item::before {
+      background: var(--success);
+    }
+    
+    .expense-item::before {
+      background: var(--danger);
+    }
+    
+    .transaction-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    
+    .transaction-category {
+      font-weight: 500;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .transaction-amount {
+      font-weight: 700;
+      font-family: 'Orbitron', sans-serif;
+    }
+    
+    .income-amount {
+      color: var(--success);
+    }
+    
+    .expense-amount {
+      color: var(--danger);
+    }
+    
+    .transaction-description {
+      margin: 8px 0;
       color: white;
     }
     
-    th, td {
-      padding: 12px 15px;
-      text-align: left;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    .transaction-comments {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.6);
+      font-style: italic;
     }
     
-    th {
-      background: rgba(255, 159, 243, 0.2);
-      font-weight: 500;
-      color: var(--pig-pink);
-      text-transform: uppercase;
-      font-size: 14px;
-      letter-spacing: 1px;
+    .transaction-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.5);
     }
     
-    tr:hover {
-      background: rgba(255, 255, 255, 0.05);
-    }
-    
-    .status-active {
-      color: var(--success);
-      font-weight: 500;
-    }
-    
-    .status-processed {
-      color: var(--danger);
-      font-weight: 500;
+    .transaction-actions {
+      display: flex;
+      gap: 10px;
     }
     
     .action-btn {
@@ -513,63 +467,18 @@
       cursor: pointer;
       font-size: 14px;
       transition: color 0.3s ease;
-      margin-right: 10px;
-    }
-    
-    .edit-btn:hover {
-      color: var(--future-blue);
     }
     
     .delete-btn:hover {
       color: var(--danger);
     }
     
-    .process-btn:hover {
-      color: var(--warning);
-    }
-    
-    /* Financial Summary */
-    .financial-summary {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
-      margin-top: 30px;
-    }
-    
-    .summary-card {
-      background: var(--glass);
-      backdrop-filter: blur(10px);
-      border-radius: 15px;
-      padding: 25px;
-      border: 1px solid var(--glass-border);
-    }
-    
-    .summary-card h3 {
-      margin-bottom: 20px;
-      color: var(--pig-pink);
-      font-size: 18px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      padding-bottom: 10px;
-    }
-    
-    .summary-item {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-      padding-bottom: 10px;
-      border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
-    }
-    
-    .summary-item:last-child {
-      border-bottom: none;
-      margin-bottom: 0;
-      padding-bottom: 0;
-      font-weight: 500;
-      color: white;
-    }
-    
     /* Responsive Design */
     @media (max-width: 768px) {
+      .transactions-layout {
+        grid-template-columns: 1fr;
+      }
+      
       .form-row {
         grid-template-columns: 1fr;
       }
@@ -582,18 +491,6 @@
       .user-info {
         width: 100%;
         justify-content: space-between;
-      }
-      
-      .batch-selector {
-        flex-direction: column;
-      }
-      
-      .batch-card {
-        width: 100%;
-      }
-      
-      .financial-summary {
-        grid-template-columns: 1fr;
       }
     }
     
@@ -624,61 +521,26 @@
       display: none;
     }
     
-    /* Checkbox Style */
-    .checkbox-container {
-      display: block;
+    /* Futuristic Elements */
+    .glow-effect {
       position: relative;
-      padding-left: 35px;
-      margin-bottom: 12px;
-      cursor: pointer;
-      user-select: none;
     }
     
-    .checkbox-container input {
-      position: absolute;
-      opacity: 0;
-      cursor: pointer;
-      height: 0;
-      width: 0;
-    }
-    
-    .checkmark {
+    .glow-effect::after {
+      content: '';
       position: absolute;
       top: 0;
       left: 0;
-      height: 25px;
-      width: 25px;
-      background-color: rgba(255, 255, 255, 0.1);
-      border-radius: 5px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at center, rgba(0, 206, 201, 0.4) 0%, transparent 70%);
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.5s ease;
     }
     
-    .checkbox-container:hover input ~ .checkmark {
-      background-color: rgba(255, 255, 255, 0.2);
-    }
-    
-    .checkbox-container input:checked ~ .checkmark {
-      background-color: var(--success);
-    }
-    
-    .checkmark:after {
-      content: "";
-      position: absolute;
-      display: none;
-    }
-    
-    .checkbox-container input:checked ~ .checkmark:after {
-      display: block;
-    }
-    
-    .checkbox-container .checkmark:after {
-      left: 9px;
-      top: 5px;
-      width: 5px;
-      height: 10px;
-      border: solid white;
-      border-width: 0 3px 3px 0;
-      transform: rotate(45deg);
+    .glow-effect:hover::after {
+      opacity: 1;
     }
   </style>
 </head>
@@ -726,8 +588,8 @@
     
     <!-- App Section -->
     <div id="app-section" class="hidden">
-      <header>
-        <div class="logo">PORCICONTROL PRO</div>
+      <header class="glow-effect">
+        <div class="logo">AVICONTROL PRO</div>
         <div class="user-info">
           <span id="user-name"></span>
           <button class="btn btn-danger" onclick="logout()">CERRAR SESIÓN</button>
@@ -740,174 +602,102 @@
           <div class="card">
             <h3>INGRESOS TOTALES</h3>
             <div class="card-value income-value" id="total-income">$0.00</div>
-            <p>Esta tanda</p>
+            <p>Este mes</p>
           </div>
           <div class="card">
             <h3>GASTOS TOTALES</h3>
             <div class="card-value expense-value" id="total-expense">$0.00</div>
-            <p>Esta tanda</p>
+            <p>Este mes</p>
           </div>
           <div class="card">
             <h3>BALANCE</h3>
             <div class="card-value balance-value" id="total-balance">$0.00</div>
-            <p>Esta tanda</p>
+            <p>Este mes</p>
           </div>
           <div class="card">
-            <h3>CHANCHOS ACTIVOS</h3>
-            <div class="card-value pigs-value" id="total-pigs">0</div>
-            <p>Esta tanda</p>
+            <h3>BALANCEADO</h3>
+            <div class="card-value feed-value" id="total-feed">0 kg</div>
+            <p>Comprado este mes</p>
           </div>
         </div>
         
-        <!-- Batch Selector -->
-        <h3>LOTES DE CERDOS</h3>
-        <div class="batch-selector" id="batch-selector">
-          <!-- Los lotes se cargarán aquí -->
-          <div class="batch-card add-batch-btn" onclick="openNewBatchModal()">
-            <h4>+ Nuevo Lote</h4>
-            <p>Agregar nueva tanda</p>
-          </div>
-        </div>
-        
-        <!-- Pig Form -->
-        <div class="pig-form">
-          <h3>REGISTRAR NUEVO CERDO</h3>
+        <!-- Transaction Form -->
+        <div class="transaction-form glow-effect">
+          <h3>REGISTRAR NUEVA TRANSACCIÓN</h3>
           <div class="form-row">
             <div class="form-group">
-              <label for="pig-number">NÚMERO DE IDENTIFICACIÓN</label>
-              <input type="number" id="pig-number" class="form-control" min="1" required>
+              <label for="transaction-type">TIPO</label>
+              <select id="transaction-type" class="form-control" required>
+                <option value="">Seleccionar...</option>
+                <option value="income">Ingreso</option>
+                <option value="expense">Gasto</option>
+              </select>
             </div>
             <div class="form-group">
-              <label for="pig-earring">ARETE (Agrocalidad)</label>
-              <input type="text" id="pig-earring" class="form-control" placeholder="Ej: EC 020279540" required>
+              <label for="transaction-category">CATEGORÍA</label>
+              <select id="transaction-category" class="form-control" required>
+                <option value="">Seleccionar...</option>
+                <optgroup label="Ingresos">
+                  <option value="venta_pollos">Venta de Pollos</option>
+                  <option value="venta_huevos">Venta de Huevos</option>
+                  <option value="subsidios">Subsidios</option>
+                </optgroup>
+                <optgroup label="Gastos">
+                  <option value="balanceado">Balanceado</option>
+                  <option value="medicinas">Medicinas</option>
+                  <option value="vacunas">Vacunas</option>
+                  <option value="mano_obra">Mano de Obra</option>
+                  <option value="equipos">Equipos</option>
+                </optgroup>
+              </select>
             </div>
           </div>
           
           <div class="form-row">
             <div class="form-group">
-              <label for="pig-weight">PESO (kg)</label>
-              <input type="number" id="pig-weight" class="form-control" min="0" step="0.1" required>
+              <label for="transaction-amount">MONTO (USD)</label>
+              <input type="number" id="transaction-amount" class="form-control" min="0" step="0.01" required>
             </div>
             <div class="form-group">
-              <label for="pig-quarter">CUARTO</label>
-              <input type="number" id="pig-quarter" class="form-control" min="1" max="4">
+              <label for="transaction-quantity">CANTIDAD (kg para balanceado)</label>
+              <input type="number" id="transaction-quantity" class="form-control" min="0" step="0.1">
             </div>
           </div>
           
-          <div class="form-row">
-            <div class="form-group">
-              <label for="pig-price">PRECIO POR KILO ($)</label>
-              <input type="number" id="pig-price" class="form-control" min="0" step="0.01">
-            </div>
-            <div class="form-group">
-              <label for="pig-entry-date">FECHA DE INGRESO</label>
-              <input type="date" id="pig-entry-date" class="form-control" required>
-            </div>
+          <div class="form-group">
+            <label for="transaction-description">DESCRIPCIÓN</label>
+            <input type="text" id="transaction-description" class="form-control" required>
           </div>
           
-          <button type="button" class="btn btn-primary" onclick="addPig()">
-            REGISTRAR CERDO
+          <div class="form-group">
+            <label for="transaction-comments">COMENTARIOS</label>
+            <textarea id="transaction-comments" class="form-control" rows="3"></textarea>
+          </div>
+          
+          <button type="button" class="btn btn-primary" onclick="addTransaction()">
+            <i class="fas fa-save"></i> GUARDAR TRANSACCIÓN
           </button>
         </div>
         
-        <!-- Pigs Table -->
-        <h3>REGISTRO DE CERDOS</h3>
-        <div class="pigs-table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>N°</th>
-                <th>ARETE</th>
-                <th>PESO (kg)</th>
-                <th>CUARTO</th>
-                <th>VALOR ($)</th>
-                <th>FECHA</th>
-                <th>ESTADO</th>
-                <th>ACCIONES</th>
-              </tr>
-            </thead>
-            <tbody id="pigs-table-body">
-              <!-- Los cerdos se cargarán aquí -->
-            </tbody>
-          </table>
-        </div>
-        
-        <!-- Financial Summary -->
-        <div class="financial-summary">
-          <div class="summary-card">
-            <h3>RESUMEN FINANCIERO</h3>
-            <div class="summary-item">
-              <span>Total ingresos por ventas:</span>
-              <span id="sales-income">$0.00</span>
-            </div>
-            <div class="summary-item">
-              <span>Total gastos en alimentación:</span>
-              <span id="feed-expense">$0.00</span>
-            </div>
-            <div class="summary-item">
-              <span>Total gastos en medicinas:</span>
-              <span id="medicine-expense">$0.00</span>
-            </div>
-            <div class="summary-item">
-              <span>Otros gastos:</span>
-              <span id="other-expense">$0.00</span>
-            </div>
-            <div class="summary-item">
-              <span>BALANCE FINAL:</span>
-              <span id="final-balance">$0.00</span>
+        <!-- Transactions Layout -->
+        <div class="transactions-layout">
+          <!-- Income Column -->
+          <div class="transactions-column income-column">
+            <h3>INGRESOS</h3>
+            <div class="transactions-list" id="income-container">
+              <!-- Los ingresos se cargarán aquí -->
             </div>
           </div>
           
-          <div class="summary-card">
-            <h3>ESTADÍSTICAS DE PRODUCCIÓN</h3>
-            <div class="summary-item">
-              <span>Total cerdos registrados:</span>
-              <span id="total-pigs-registered">0</span>
-            </div>
-            <div class="summary-item">
-              <span>Cerdos procesados:</span>
-              <span id="pigs-processed">0</span>
-            </div>
-            <div class="summary-item">
-              <span>Cerdos activos:</span>
-              <span id="pigs-active">0</span>
-            </div>
-            <div class="summary-item">
-              <span>Peso promedio:</span>
-              <span id="avg-weight">0 kg</span>
-            </div>
-            <div class="summary-item">
-              <span>Valor promedio:</span>
-              <span id="avg-value">$0.00</span>
+          <!-- Expense Column -->
+          <div class="transactions-column expense-column">
+            <h3>GASTOS</h3>
+            <div class="transactions-list" id="expense-container">
+              <!-- Los gastos se cargarán aquí -->
             </div>
           </div>
         </div>
       </section>
-    </div>
-    
-    <!-- New Batch Modal -->
-    <div id="new-batch-modal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3>NUEVO LOTE DE CERDOS</h3>
-          <button class="close-modal" onclick="closeNewBatchModal()">&times;</button>
-        </div>
-        <div class="form-group">
-          <label for="batch-name">NOMBRE DEL LOTE</label>
-          <input type="text" id="batch-name" class="form-control" placeholder="Ej: Tanda Enero 2023" required>
-        </div>
-        <div class="form-group">
-          <label for="batch-description">DESCRIPCIÓN (opcional)</label>
-          <textarea id="batch-description" class="form-control" rows="3"></textarea>
-        </div>
-        <div class="form-group">
-          <label for="batch-start-date">FECHA DE INICIO</label>
-          <input type="date" id="batch-start-date" class="form-control" required>
-        </div>
-        <button type="button" class="btn btn-primary btn-block" onclick="createNewBatch()">
-          CREAR NUEVO LOTE
-        </button>
-      </div>
     </div>
   </div>
 
@@ -928,37 +718,24 @@
     const auth = firebase.auth();
     const database = firebase.database();
 
-    // Global variables
-    let currentUser = null;
-    let currentBatch = null;
-    let batches = [];
-    let pigs = [];
-    let expenses = [];
-    let sales = [];
-
     // DOM Elements
     const authSection = document.getElementById('auth-section');
     const appSection = document.getElementById('app-section');
     const userNameDisplay = document.getElementById('user-name');
-    const batchSelector = document.getElementById('batch-selector');
-    const pigsTableBody = document.getElementById('pigs-table-body');
-    const newBatchModal = document.getElementById('new-batch-modal');
     
     // Auth State Listener
     auth.onAuthStateChanged((user) => {
       if (user) {
         // User is signed in
-        currentUser = user;
         authSection.classList.add('hidden');
         appSection.classList.remove('hidden');
         
         // Load user data
         loadUserData(user.uid);
-        // Load batches
-        loadBatches(user.uid);
+        // Load transactions
+        loadTransactions(user.uid);
       } else {
         // User is signed out
-        currentUser = null;
         authSection.classList.remove('hidden');
         appSection.classList.add('hidden');
       }
@@ -1040,48 +817,174 @@
       });
     }
 
-    // Load batches
-    function loadBatches(userId) {
-      const batchesRef = database.ref('users/' + userId + '/batches');
+    // Add new transaction
+    function addTransaction() {
+      const type = document.getElementById('transaction-type').value;
+      const category = document.getElementById('transaction-category').value;
+      const amount = parseFloat(document.getElementById('transaction-amount').value);
+      const quantity = parseFloat(document.getElementById('transaction-quantity').value) || 0;
+      const description = document.getElementById('transaction-description').value;
+      const comments = document.getElementById('transaction-comments').value;
       
-      batchesRef.on('value', (snapshot) => {
-        batchSelector.innerHTML = `
-          <div class="batch-card add-batch-btn" onclick="openNewBatchModal()">
-            <h4>+ Nuevo Lote</h4>
-            <p>Agregar nueva tanda</p>
-          </div>
-        `;
+      if (!type || !category || !amount || !description) {
+        alert('Por favor complete todos los campos requeridos');
+        return;
+      }
+      
+      const user = auth.currentUser;
+      if (user) {
+        const transactionRef = database.ref('users/' + user.uid + '/transactions');
+        const newTransaction = {
+          type: type,
+          category: category,
+          amount: amount,
+          quantity: category === 'balanceado' ? quantity : null,
+          description: description,
+          comments: comments,
+          date: new Date().toISOString()
+        };
         
-        batches = [];
+        transactionRef.push(newTransaction)
+          .then(() => {
+            // Clear form
+            document.getElementById('transaction-type').value = '';
+            document.getElementById('transaction-category').value = '';
+            document.getElementById('transaction-amount').value = '';
+            document.getElementById('transaction-quantity').value = '';
+            document.getElementById('transaction-description').value = '';
+            document.getElementById('transaction-comments').value = '';
+          })
+          .catch((error) => {
+            alert('Error al guardar: ' + error.message);
+          });
+      }
+    }
+
+    // Load transactions
+    function loadTransactions(userId) {
+      const transactionsRef = database.ref('users/' + userId + '/transactions');
+      const incomeContainer = document.getElementById('income-container');
+      const expenseContainer = document.getElementById('expense-container');
+      
+      transactionsRef.on('value', (snapshot) => {
+        incomeContainer.innerHTML = '';
+        expenseContainer.innerHTML = '';
+        let totalIncome = 0;
+        let totalExpense = 0;
+        let totalFeed = 0;
         
         if (snapshot.exists()) {
+          // Convert to array and sort by date (newest first)
+          const transactions = [];
           snapshot.forEach((childSnapshot) => {
-            const batch = {
+            transactions.push({
               id: childSnapshot.key,
               ...childSnapshot.val()
-            };
-            batches.push(batch);
-            
-            const batchElement = document.createElement('div');
-            batchElement.className = 'batch-card';
-            batchElement.innerHTML = `
-              <h4>${batch.name}</h4>
-              <p>Iniciado: ${formatDate(batch.startDate)}</p>
-            `;
-            
-            batchElement.addEventListener('click', () => {
-              selectBatch(batch.id);
             });
-            
-            batchSelector.insertBefore(batchElement, batchSelector.firstChild);
           });
           
-          // Select the first batch by default
-          if (batches.length > 0) {
-            selectBatch(batches[0].id);
-          }
+          transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+          
+          // Display transactions and calculate totals
+          transactions.forEach((transaction) => {
+            const transactionElement = document.createElement('div');
+            transactionElement.className = `transaction-item ${transaction.type}-item`;
+            
+            if (transaction.type === 'income') {
+              totalIncome += transaction.amount;
+              
+              transactionElement.innerHTML = `
+                <div class="transaction-header">
+                  <span class="transaction-category">${formatCategory(transaction.category)}</span>
+                  <span class="transaction-amount income-amount">+$${transaction.amount.toFixed(2)}</span>
+                </div>
+                <div class="transaction-description">${transaction.description}</div>
+                ${transaction.comments ? `<div class="transaction-comments">${transaction.comments}</div>` : ''}
+                <div class="transaction-footer">
+                  <span class="transaction-date">${formatDate(transaction.date)}</span>
+                  <div class="transaction-actions">
+                    <button class="action-btn delete-btn" onclick="deleteTransaction('${userId}', '${transaction.id}')">
+                      <i class="fas fa-trash"></i> Eliminar
+                    </button>
+                  </div>
+                </div>
+              `;
+              
+              incomeContainer.appendChild(transactionElement);
+            } else {
+              totalExpense += transaction.amount;
+              if (transaction.category === 'balanceado' && transaction.quantity) {
+                totalFeed += transaction.quantity;
+              }
+              
+              transactionElement.innerHTML = `
+                <div class="transaction-header">
+                  <span class="transaction-category">${formatCategory(transaction.category)}</span>
+                  <span class="transaction-amount expense-amount">-$${transaction.amount.toFixed(2)}</span>
+                </div>
+                <div class="transaction-description">${transaction.description}</div>
+                ${transaction.quantity ? `<div class="transaction-comments">Cantidad: ${transaction.quantity} kg</div>` : ''}
+                ${transaction.comments ? `<div class="transaction-comments">${transaction.comments}</div>` : ''}
+                <div class="transaction-footer">
+                  <span class="transaction-date">${formatDate(transaction.date)}</span>
+                  <div class="transaction-actions">
+                    <button class="action-btn delete-btn" onclick="deleteTransaction('${userId}', '${transaction.id}')">
+                      <i class="fas fa-trash"></i> Eliminar
+                    </button>
+                  </div>
+                </div>
+              `;
+              
+              expenseContainer.appendChild(transactionElement);
+            }
+          });
+        } else {
+          incomeContainer.innerHTML = '<div class="transaction-item">No hay ingresos registrados</div>';
+          expenseContainer.innerHTML = '<div class="transaction-item">No hay gastos registrados</div>';
         }
+        
+        // Update totals
+        document.getElementById('total-income').textContent = '$' + totalIncome.toFixed(2);
+        document.getElementById('total-expense').textContent = '$' + totalExpense.toFixed(2);
+        document.getElementById('total-balance').textContent = '$' + (totalIncome - totalExpense).toFixed(2);
+        document.getElementById('total-feed').textContent = totalFeed.toFixed(1) + ' kg';
       });
     }
 
-    //
+    // Delete transaction
+    function deleteTransaction(userId, transactionId) {
+      if (confirm('¿Estás seguro de que deseas eliminar esta transacción?')) {
+        const transactionRef = database.ref('users/' + userId + '/transactions/' + transactionId);
+        transactionRef.remove()
+          .catch((error) => {
+            alert('Error al eliminar: ' + error.message);
+          });
+      }
+    }
+
+    // Helper function to format category
+    function formatCategory(category) {
+      const categories = {
+        'venta_pollos': 'Venta de Pollos',
+        'venta_huevos': 'Venta de Huevos',
+        'subsidios': 'Subsidios',
+        'balanceado': 'Balanceado',
+        'medicinas': 'Medicinas',
+        'vacunas': 'Vacunas',
+        'mano_obra': 'Mano de Obra',
+        'equipos': 'Equipos'
+      };
+      return categories[category] || category;
+    }
+
+    // Helper function to format date
+    function formatDate(dateString) {
+      const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+      return new Date(dateString).toLocaleDateString('es-ES', options);
+    }
+  </script>
+  
+  <!-- Font Awesome for icons -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</body>
+</html>
