@@ -649,73 +649,35 @@
             }
         }
         
-   /* Modal de Autenticación - Ajustes para móvil */
-@media (max-width: 480px) {
-    .auth-container {
-        width: 95%;
-        min-height: auto;
-        max-height: 90vh;
-        overflow-y: auto;
-    }
-    
-    .auth-form-container {
-        padding: 25px 20px;
-        min-height: 0;
-    }
-    
-    .auth-header h2 {
-        font-size: 1.5rem;
-        margin-bottom: 20px;
-    }
-    
-    .auth-form {
-        gap: 15px;
-    }
-    
-    .auth-form input {
-        padding: 12px 15px;
-        font-size: 0.9rem;
-    }
-    
-    .auth-submit {
-        padding: 12px;
-        font-size: 0.9rem;
-    }
-    
-    .auth-toggle span {
-        font-size: 0.9rem;
-    }
-    
-    .close-auth {
-        top: 10px;
-        right: 10px;
-        font-size: 1.3rem;
-    }
-    
-    /* Asegurar que el modal no se desborde */
-    .auth-modal {
-        align-items: flex-start;
-        padding-top: 20px;
-        padding-bottom: 20px;
-    }
-    
-    /* Ajustar el contenedor de formularios */
-    .auth-forms {
-        height: auto;
-    }
-    
-    /* Asegurar que los formularios ocupen todo el espacio disponible */
-    .auth-form-container {
-        height: auto;
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .auth-form {
-        flex-grow: 1;
-        justify-content: center;
-    }
-}
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .auth-container {
+                flex-direction: column;
+                max-width: 90%;
+            }
+            
+            .auth-forms {
+                flex-direction: column;
+                height: 100%;
+            }
+            
+            .auth-form-container {
+                width: 100%;
+                padding: 30px;
+            }
+            
+            .auth-container.register-mode .auth-forms {
+                transform: translateY(-50%);
+            }
+        }
     </style>
 </head>
 <body>
