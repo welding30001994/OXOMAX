@@ -6,6 +6,7 @@
     <title>NexusMail - Email Futurista</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         :root {
             --primary: #00f7ff;
@@ -332,6 +333,63 @@
             z-index: 0;
         }
 
+        /* Bandeja de salida */
+        .outbox-container {
+            width: 100%;
+            max-width: 800px;
+            margin-top: 2rem;
+        }
+
+        .outbox-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .outbox-list {
+            border: 1px solid var(--primary);
+            border-radius: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .outbox-item {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(0, 247, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .outbox-item:last-child {
+            border-bottom: none;
+        }
+
+        .outbox-info {
+            flex: 1;
+        }
+
+        .outbox-to {
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .outbox-subject {
+            margin: 0.3rem 0;
+        }
+
+        .outbox-date {
+            font-size: 0.8rem;
+            color: rgba(224, 224, 224, 0.7);
+        }
+
+        .outbox-delete {
+            color: var(--error);
+            cursor: pointer;
+            margin-left: 1rem;
+        }
+
         /* Animaciones */
         @keyframes flicker {
             0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
@@ -361,6 +419,17 @@
             .cyber-stats {
                 flex-direction: column;
                 gap: 1rem;
+            }
+
+            .outbox-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .outbox-delete {
+                margin-left: 0;
+                margin-top: 0.5rem;
+                align-self: flex-end;
             }
         }
     </style>
@@ -400,8 +469,8 @@
                 <h2 class="cyber-h2"><i class="fas fa-paper-plane"></i> Nuevo Mensaje</h2>
                 <form id="email-form">
                     <div class="cyber-input-group">
-                        <label for="to">Destinatario:</label>
-                        <input type="email" id="to" required class="cyber-input">
+                        <label for="to">Destinatario (Gmail):</label>
+                        <input type="email" id="to" required class="cyber-input" placeholder="ejemplo@gmail.com">
                     </div>
                     <div class="cyber-input-group">
                         <label for="subject">Asunto:</label>
@@ -423,6 +492,17 @@
                 <div class="stat-item">
                     <div class="stat-value" id="user-since">2023</div>
                     <div class="stat-label">Usuario desde</div>
+                </div>
+            </div>
+
+            <!-- Bandeja de salida -->
+            <div class="outbox-container hidden" id="outbox-panel">
+                <div class="outbox-header">
+                    <h2 class="cyber-h2"><i class="fas fa-inbox"></i> Bandeja de Salida</h2>
+                    <button id="refresh-outbox" class="cyber-button"><i class="fas fa-sync-alt"></i> Actualizar</button>
+                </div>
+                <div class="outbox-list" id="outbox-list">
+                    <!-- Los correos enviados aparecerán aquí -->
                 </div>
             </div>
         </main>
@@ -476,6 +556,9 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+        // Inicialización de EmailJS (reemplaza con tus credenciales)
+        emailjs.init('TU_USER_ID_EMAILJS');
+
         // Variables del DOM
         const loginBtn = document.getElementById('login-btn');
         const registerBtn = document.getElementById('register-btn');
@@ -490,6 +573,9 @@
         const userStats = document.getElementById('user-stats');
         const emailForm = document.getElementById('email-form');
         const terminalOutput = document.getElementById('terminal-output');
+        const outboxPanel = document.getElementById('outbox-panel');
+        const outboxList = document.getElementById('outbox-list');
+        const refreshOutboxBtn = document.getElementById('refresh-outbox');
 
         // Estado de autenticación
         let isLoginMode = true;
@@ -518,6 +604,7 @@
 
         authForm.addEventListener('submit', handleAuth);
         emailForm.addEventListener('submit', sendEmail);
+        refreshOutboxBtn.addEventListener('click', loadOutbox);
 
         // Observador de autenticación
         auth.onAuthStateChanged(user => {
@@ -527,9 +614,11 @@
                 registerBtn.classList.add('hidden');
                 emailPanel.classList.remove('hidden');
                 userStats.classList.remove('hidden');
+                outboxPanel.classList.remove('hidden');
                 
-                // Actualizar estadísticas
+                // Actualizar estadísticas y bandeja de salida
                 updateUserStats(user.uid);
+                loadOutbox();
                 
                 // Cambiar el comportamiento del botón de login a logout
                 loginBtn.onclick = () => auth.signOut();
@@ -547,6 +636,7 @@
                 registerBtn.classList.remove('hidden');
                 emailPanel.classList.add('hidden');
                 userStats.classList.add('hidden');
+                outboxPanel.classList.add('hidden');
                 
                 // Mostrar mensaje en terminal
                 addTerminalMessage("> Sesión cerrada");
@@ -639,28 +729,134 @@
             }
             
             try {
-                // Aquí iría la lógica para enviar el correo
-                // En un entorno real, usarías un servicio como SendGrid, Mailgun o un Cloud Function
-                
-                // Por ahora simulamos el envío
                 addTerminalMessage(`> Enviando correo a: ${to}`);
                 addTerminalMessage(`> Asunto: ${subject}`);
+                
+                // Guardar el correo en Firestore antes de enviarlo
+                const emailData = {
+                    to: to,
+                    subject: subject,
+                    message: message,
+                    from: user.email,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'enviando'
+                };
+                
+                const emailRef = await db.collection('emails').add(emailData);
+                
+                // Enviar el correo usando EmailJS
+                const serviceID = 'default_service'; // Reemplaza con tu Service ID de EmailJS
+                const templateID = 'template_nexusmail'; // Reemplaza con tu Template ID de EmailJS
+                
+                const emailParams = {
+                    to_email: to,
+                    from_email: user.email,
+                    subject: subject,
+                    message: message
+                };
+                
+                // Envío real del correo
+                await emailjs.send(serviceID, templateID, emailParams);
+                
+                // Actualizar estado del correo en Firestore
+                await emailRef.update({
+                    status: 'enviado',
+                    sentAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
                 
                 // Actualizar contador en Firestore
                 await db.collection('users').doc(user.uid).update({
                     sentEmails: firebase.firestore.FieldValue.increment(1)
                 });
                 
-                // Actualizar estadísticas
+                // Actualizar estadísticas y bandeja de salida
                 updateUserStats(user.uid);
+                loadOutbox();
                 
                 // Limpiar formulario
                 emailForm.reset();
                 
-                addTerminalMessage("> Correo enviado con éxito");
+                addTerminalMessage("> Correo enviado con éxito a Gmail");
             } catch (error) {
                 console.error("Error al enviar correo:", error);
+                
+                // Marcar como error si falla
+                if (emailRef) {
+                    await emailRef.update({
+                        status: 'error',
+                        error: error.message
+                    });
+                }
+                
                 addTerminalMessage(`> Error al enviar: ${error.message}`, true);
+            }
+        }
+
+        async function loadOutbox() {
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            try {
+                outboxList.innerHTML = '<p class="terminal-text">> Cargando bandeja de salida...</p>';
+                
+                const snapshot = await db.collection('emails')
+                    .where('from', '==', user.email)
+                    .orderBy('createdAt', 'desc')
+                    .limit(20)
+                    .get();
+                
+                if (snapshot.empty) {
+                    outboxList.innerHTML = '<p class="terminal-text">> No hay correos enviados</p>';
+                    return;
+                }
+                
+                outboxList.innerHTML = '';
+                
+                snapshot.forEach(doc => {
+                    const email = doc.data();
+                    const emailItem = document.createElement('div');
+                    emailItem.className = 'outbox-item';
+                    
+                    const date = email.createdAt?.toDate() || new Date();
+                    const formattedDate = date.toLocaleString();
+                    
+                    emailItem.innerHTML = `
+                        <div class="outbox-info">
+                            <div class="outbox-to">Para: ${email.to}</div>
+                            <div class="outbox-subject">Asunto: ${email.subject}</div>
+                            <div class="outbox-date">${formattedDate} - Estado: ${email.status}</div>
+                            ${email.error ? `<div class="outbox-error">Error: ${email.error}</div>` : ''}
+                        </div>
+                        <div class="outbox-actions">
+                            <i class="fas fa-trash outbox-delete" data-id="${doc.id}"></i>
+                        </div>
+                    `;
+                    
+                    outboxList.appendChild(emailItem);
+                });
+                
+                // Agregar event listeners para borrar
+                document.querySelectorAll('.outbox-delete').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const emailId = e.target.getAttribute('data-id');
+                        await deleteEmail(emailId);
+                    });
+                });
+                
+            } catch (error) {
+                console.error("Error al cargar bandeja de salida:", error);
+                outboxList.innerHTML = '<p class="terminal-text" style="color: var(--error)">> Error al cargar bandeja de salida</p>';
+            }
+        }
+
+        async function deleteEmail(emailId) {
+            try {
+                await db.collection('emails').doc(emailId).delete();
+                addTerminalMessage("> Correo eliminado de la bandeja");
+                loadOutbox();
+            } catch (error) {
+                console.error("Error al eliminar correo:", error);
+                addTerminalMessage(`> Error al eliminar: ${error.message}`, true);
             }
         }
 
