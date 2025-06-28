@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Biblioteca Futurista de Finanzas</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
     <style>
         :root {
             --primary: #00f7ff;
@@ -334,6 +336,23 @@
                 text-shadow: 0 0 15px var(--primary), 0 0 20px var(--secondary);
             }
         }
+        
+        /* Loading spinner */
+        .spinner {
+            display: none;
+            width: 40px;
+            height: 40px;
+            margin: 20px auto;
+            border: 4px solid rgba(0, 247, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary);
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -374,6 +393,7 @@
                 <button type="submit" class="modal-btn">Ingresar</button>
                 <div class="error-message" id="loginError"></div>
             </form>
+            <div class="spinner" id="loginSpinner"></div>
         </div>
     </div>
     
@@ -398,10 +418,41 @@
                 <button type="submit" class="modal-btn">Crear Cuenta</button>
                 <div class="error-message" id="registerError"></div>
             </form>
+            <div class="spinner" id="registerSpinner"></div>
         </div>
     </div>
     
     <script>
+        // Firebase configuration and initialization
+        const firebaseConfig = {
+            apiKey: "AIzaSyD3MI1klgBSHs1h6QT4VPNoScCfCwMV_Ck",
+            authDomain: "usuario-b0384.firebaseapp.com",
+            databaseURL: "https://usuario-b0384-default-rtdb.firebaseio.com",
+            projectId: "usuario-b0384",
+            storageBucket: "usuario-b0384.firebasestorage.app",
+            messagingSenderId: "196266170863",
+            appId: "1:196266170863:web:4ea57f489df94aba94fe1a"
+        };
+        
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        
+        // DOM Elements
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const loginModal = document.getElementById('loginModal');
+        const registerModal = document.getElementById('registerModal');
+        const closeModalButtons = document.querySelectorAll('.close-modal');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const loginError = document.getElementById('loginError');
+        const registerError = document.getElementById('registerError');
+        const loginSpinner = document.getElementById('loginSpinner');
+        const registerSpinner = document.getElementById('registerSpinner');
+        const booksContainer = document.getElementById('booksContainer');
+        
         // Book data with direct download links
         const books = {
             padre_rico_padre_pobre: {
@@ -429,19 +480,6 @@
                 downloadUrl: "https://cisprocr.com/cispro/system/files/Doce%20Pilares.pdf"
             }
         };
-        
-        // DOM Elements
-        const loginBtn = document.getElementById('loginBtn');
-        const registerBtn = document.getElementById('registerBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const loginModal = document.getElementById('loginModal');
-        const registerModal = document.getElementById('registerModal');
-        const closeModalButtons = document.querySelectorAll('.close-modal');
-        const loginForm = document.getElementById('loginForm');
-        const registerForm = document.getElementById('registerForm');
-        const loginError = document.getElementById('loginError');
-        const registerError = document.getElementById('registerError');
-        const booksContainer = document.getElementById('booksContainer');
         
         // Modal functionality
         function openModal(modal) {
@@ -472,70 +510,99 @@
             }
         });
         
-        // Authentication simulation (since we removed Firebase)
-        let currentUser = null;
-        
-        loginForm.addEventListener('submit', (e) => {
+        // Authentication
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
             
-            // Simulate authentication
-            if (email && password) {
-                currentUser = { email };
+            loginError.textContent = '';
+            loginSpinner.style.display = 'block';
+            
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
                 closeModal(loginModal);
-                updateAuthState();
-            } else {
-                loginError.textContent = 'Por favor completa todos los campos';
+            } catch (error) {
+                loginError.textContent = getAuthErrorMessage(error.code);
+            } finally {
+                loginSpinner.style.display = 'none';
             }
         });
         
-        registerForm.addEventListener('submit', (e) => {
+        registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            registerError.textContent = '';
             
             if (password !== confirmPassword) {
                 registerError.textContent = 'Las contraseñas no coinciden';
                 return;
             }
             
-            if (email && password) {
-                currentUser = { email };
+            registerSpinner.style.display = 'block';
+            
+            try {
+                await auth.createUserWithEmailAndPassword(email, password);
                 closeModal(registerModal);
-                updateAuthState();
-            } else {
-                registerError.textContent = 'Por favor completa todos los campos';
+            } catch (error) {
+                registerError.textContent = getAuthErrorMessage(error.code);
+            } finally {
+                registerSpinner.style.display = 'none';
             }
         });
         
         logoutBtn.addEventListener('click', () => {
-            currentUser = null;
-            updateAuthState();
+            auth.signOut();
         });
         
-        function updateAuthState() {
-            if (currentUser) {
-                loginBtn.style.display = 'none';
-                registerBtn.style.display = 'none';
-                logoutBtn.style.display = 'block';
-                loadBooks();
-            } else {
-                loginBtn.style.display = 'block';
-                registerBtn.style.display = 'block';
-                logoutBtn.style.display = 'none';
-                showLoginMessage();
+        function getAuthErrorMessage(code) {
+            switch(code) {
+                case 'auth/invalid-email':
+                    return 'Correo electrónico inválido';
+                case 'auth/user-disabled':
+                    return 'Cuenta deshabilitada';
+                case 'auth/user-not-found':
+                    return 'Usuario no encontrado';
+                case 'auth/wrong-password':
+                    return 'Contraseña incorrecta';
+                case 'auth/email-already-in-use':
+                    return 'El correo ya está en uso';
+                case 'auth/weak-password':
+                    return 'La contraseña es muy débil (mínimo 6 caracteres)';
+                case 'auth/operation-not-allowed':
+                    return 'Operación no permitida';
+                default:
+                    return 'Error al autenticar. Intenta nuevamente.';
             }
         }
         
-        function showLoginMessage() {
-            booksContainer.innerHTML = `
-                <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
-                    <h3>Por favor inicia sesión o regístrate para acceder a los libros</h3>
-                </div>
-            `;
-        }
+        // Auth state observer
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // User is signed in
+                loginBtn.style.display = 'none';
+                registerBtn.style.display = 'none';
+                logoutBtn.style.display = 'block';
+                
+                // Load books
+                loadBooks();
+            } else {
+                // User is signed out
+                loginBtn.style.display = 'block';
+                registerBtn.style.display = 'block';
+                logoutBtn.style.display = 'none';
+                
+                // Show message to log in
+                booksContainer.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                        <h3>Por favor inicia sesión o regístrate para acceder a los libros</h3>
+                    </div>
+                `;
+            }
+        });
         
         // Book loading and download functionality
         function loadBooks() {
@@ -558,9 +625,6 @@
                 booksContainer.appendChild(bookCard);
             }
         }
-        
-        // Initialize
-        updateAuthState();
     </script>
 </body>
 </html>
