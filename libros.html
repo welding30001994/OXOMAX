@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Biblioteca Futurista de Finanzas</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
     <style>
         :root {
             --primary: #00f7ff;
@@ -184,51 +181,6 @@
             box-shadow: 0 0 15px var(--secondary);
         }
         
-        .admin-panel {
-            margin-top: 50px;
-            padding: 30px;
-            background: rgba(10, 10, 32, 0.7);
-            border-radius: 10px;
-            border: 1px solid rgba(255, 0, 228, 0.3);
-            display: none;
-        }
-        
-        .admin-panel h2 {
-            color: var(--secondary);
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .upload-form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        
-        .upload-form select, .upload-form input {
-            padding: 12px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(0, 247, 255, 0.3);
-            border-radius: 5px;
-            color: white;
-            font-family: 'Roboto', sans-serif;
-        }
-        
-        .upload-form button {
-            padding: 12px;
-            background: linear-gradient(90deg, var(--secondary), var(--accent));
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-family: 'Orbitron', sans-serif;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .upload-form button:hover {
-            box-shadow: 0 0 15px var(--secondary);
-        }
-        
         /* Modal styles */
         .modal {
             display: none;
@@ -382,23 +334,6 @@
                 text-shadow: 0 0 15px var(--primary), 0 0 20px var(--secondary);
             }
         }
-        
-        /* Loading spinner */
-        .spinner {
-            display: none;
-            width: 40px;
-            height: 40px;
-            margin: 20px auto;
-            border: 4px solid rgba(0, 247, 255, 0.3);
-            border-radius: 50%;
-            border-top: 4px solid var(--primary);
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
     </style>
 </head>
 <body>
@@ -420,21 +355,6 @@
         <div class="books-grid" id="booksContainer">
             <!-- Libros se cargarán dinámicamente -->
         </div>
-        
-        <div class="admin-panel" id="adminPanel">
-            <h2>Panel de Administración</h2>
-            <form class="upload-form" id="uploadForm">
-                <select id="bookSelect" required>
-                    <option value="" disabled selected>Selecciona un libro</option>
-                    <option value="padre_rico_padre_pobre">Padre Rico, Padre Pobre</option>
-                    <option value="secretos_mente_millonaria">Secretos de la Mente Millonaria</option>
-                    <option value="12_pilares">Los 12 Pilares - Jim Rohn</option>
-                    <option value="rico_babilonia">El Hombre Más Rico de Babilonia</option>
-                </select>
-                <input type="file" id="pdfFile" accept=".pdf" required>
-                <button type="submit">Subir PDF</button>
-            </form>
-        </div>
     </div>
     
     <!-- Login Modal -->
@@ -454,7 +374,6 @@
                 <button type="submit" class="modal-btn">Ingresar</button>
                 <div class="error-message" id="loginError"></div>
             </form>
-            <div class="spinner" id="loginSpinner"></div>
         </div>
     </div>
     
@@ -479,26 +398,37 @@
                 <button type="submit" class="modal-btn">Crear Cuenta</button>
                 <div class="error-message" id="registerError"></div>
             </form>
-            <div class="spinner" id="registerSpinner"></div>
         </div>
     </div>
     
     <script>
-        // Firebase configuration and initialization
-        const firebaseConfig = {
-            apiKey: "AIzaSyD3MI1klgBSHs1h6QT4VPNoScCfCwMV_Ck",
-            authDomain: "usuario-b0384.firebaseapp.com",
-            databaseURL: "https://usuario-b0384-default-rtdb.firebaseio.com",
-            projectId: "usuario-b0384",
-            storageBucket: "usuario-b0384.firebasestorage.app",
-            messagingSenderId: "196266170863",
-            appId: "1:196266170863:web:4ea57f489df94aba94fe1a"
+        // Book data with direct download links
+        const books = {
+            padre_rico_padre_pobre: {
+                title: "Padre Rico, Padre Pobre",
+                description: "Robert Kiyosaki explica la diferencia entre la mentalidad rica y la pobre a través de las lecciones de sus dos 'padres'.",
+                coverColor: "linear-gradient(135deg, #00f7ff, #0077ff)",
+                downloadUrl: "https://www.jugandoainvertir.com.ar/descargas/Padre-Rico-Padre-Pobre.pdf"
+            },
+            secretos_mente_millonaria: {
+                title: "Secretos de la Mente Millonaria",
+                description: "T. Harv Eker revela los patrones de pensamiento que diferencian a los ricos de las demás personas.",
+                coverColor: "linear-gradient(135deg, #ff00e4, #7b2dff)",
+                downloadUrl: "https://soyemprendedor.co/wp-content/uploads/2017/01/Los-Secretos-De-La-Mente-Millonaria.pdf"
+            },
+            rico_babilonia: {
+                title: "El Hombre Más Rico de Babilonia",
+                description: "George S. Clason ofrece consejos financieros atemporales a través de parábolas ambientadas en la antigua Babilonia.",
+                coverColor: "linear-gradient(135deg, #ff9900, #ff2d6d)",
+                downloadUrl: "https://irp-cdn.multiscreensite.com/3af19a39/files/uploaded/EL%20HOMBRE%20MAS%20RICO%20DE%20BABILONIA%20-%20GEORGE%20S.%20CLASON%20-%2086%20PAGINAS%282%29.pdf"
+            },
+            "12_pilares": {
+                title: "Los 12 Pilares",
+                description: "Jim Rohn comparte principios fundamentales para el éxito en los negocios y la vida personal.",
+                coverColor: "linear-gradient(135deg, #7b2dff, #00f7ff)",
+                downloadUrl: "https://cisprocr.com/cispro/system/files/Doce%20Pilares.pdf"
+            }
         };
-        
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const storage = firebase.storage();
         
         // DOM Elements
         const loginBtn = document.getElementById('loginBtn');
@@ -511,35 +441,7 @@
         const registerForm = document.getElementById('registerForm');
         const loginError = document.getElementById('loginError');
         const registerError = document.getElementById('registerError');
-        const loginSpinner = document.getElementById('loginSpinner');
-        const registerSpinner = document.getElementById('registerSpinner');
         const booksContainer = document.getElementById('booksContainer');
-        const adminPanel = document.getElementById('adminPanel');
-        const uploadForm = document.getElementById('uploadForm');
-        
-        // Book data
-        const books = {
-            padre_rico_padre_pobre: {
-                title: "Padre Rico, Padre Pobre",
-                description: "Robert Kiyosaki explica la diferencia entre la mentalidad rica y la pobre a través de las lecciones de sus dos 'padres'.",
-                coverColor: "linear-gradient(135deg, #00f7ff, #0077ff)"
-            },
-            secretos_mente_millonaria: {
-                title: "Secretos de la Mente Millonaria",
-                description: "T. Harv Eker revela los patrones de pensamiento que diferencian a los ricos de las demás personas.",
-                coverColor: "linear-gradient(135deg, #ff00e4, #7b2dff)"
-            },
-            rico_babilonia: {
-                title: "El Hombre Más Rico de Babilonia",
-                description: "George S. Clason ofrece consejos financieros atemporales a través de parábolas ambientadas en la antigua Babilonia.",
-                coverColor: "linear-gradient(135deg, #ff9900, #ff2d6d)"
-            },
-            "12_pilares": {
-                title: "Los 12 Pilares",
-                description: "Jim Rohn comparte principios fundamentales para el éxito en los negocios y la vida personal.",
-                coverColor: "linear-gradient(135deg, #7b2dff, #00f7ff)"
-            }
-        };
         
         // Modal functionality
         function openModal(modal) {
@@ -570,110 +472,73 @@
             }
         });
         
-        // Authentication
-        loginForm.addEventListener('submit', async (e) => {
+        // Authentication simulation (since we removed Firebase)
+        let currentUser = null;
+        
+        loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
             
-            loginError.textContent = '';
-            loginSpinner.style.display = 'block';
-            
-            try {
-                await auth.signInWithEmailAndPassword(email, password);
+            // Simulate authentication
+            if (email && password) {
+                currentUser = { email };
                 closeModal(loginModal);
-            } catch (error) {
-                loginError.textContent = getAuthErrorMessage(error.code);
-            } finally {
-                loginSpinner.style.display = 'none';
+                updateAuthState();
+            } else {
+                loginError.textContent = 'Por favor completa todos los campos';
             }
         });
         
-        registerForm.addEventListener('submit', async (e) => {
+        registerForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
-            
-            registerError.textContent = '';
             
             if (password !== confirmPassword) {
                 registerError.textContent = 'Las contraseñas no coinciden';
                 return;
             }
             
-            registerSpinner.style.display = 'block';
-            
-            try {
-                await auth.createUserWithEmailAndPassword(email, password);
+            if (email && password) {
+                currentUser = { email };
                 closeModal(registerModal);
-            } catch (error) {
-                registerError.textContent = getAuthErrorMessage(error.code);
-            } finally {
-                registerSpinner.style.display = 'none';
+                updateAuthState();
+            } else {
+                registerError.textContent = 'Por favor completa todos los campos';
             }
         });
         
         logoutBtn.addEventListener('click', () => {
-            auth.signOut();
+            currentUser = null;
+            updateAuthState();
         });
         
-        function getAuthErrorMessage(code) {
-            switch(code) {
-                case 'auth/invalid-email':
-                    return 'Correo electrónico inválido';
-                case 'auth/user-disabled':
-                    return 'Cuenta deshabilitada';
-                case 'auth/user-not-found':
-                    return 'Usuario no encontrado';
-                case 'auth/wrong-password':
-                    return 'Contraseña incorrecta';
-                case 'auth/email-already-in-use':
-                    return 'El correo ya está en uso';
-                case 'auth/weak-password':
-                    return 'La contraseña es muy débil (mínimo 6 caracteres)';
-                case 'auth/operation-not-allowed':
-                    return 'Operación no permitida';
-                default:
-                    return 'Error al autenticar. Intenta nuevamente.';
-            }
-        }
-        
-        // Auth state observer
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                // User is signed in
+        function updateAuthState() {
+            if (currentUser) {
                 loginBtn.style.display = 'none';
                 registerBtn.style.display = 'none';
                 logoutBtn.style.display = 'block';
-                
-                // Check if user is admin (welding30001994@gmail.com)
-                if (user.email === 'welding30001994@gmail.com') {
-                    adminPanel.style.display = 'block';
-                } else {
-                    adminPanel.style.display = 'none';
-                }
-                
-                // Load books
                 loadBooks();
             } else {
-                // User is signed out
                 loginBtn.style.display = 'block';
                 registerBtn.style.display = 'block';
                 logoutBtn.style.display = 'none';
-                adminPanel.style.display = 'none';
-                
-                // Show message to log in
-                booksContainer.innerHTML = `
-                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
-                        <h3>Por favor inicia sesión o regístrate para acceder a los libros</h3>
-                    </div>
-                `;
+                showLoginMessage();
             }
-        });
+        }
+        
+        function showLoginMessage() {
+            booksContainer.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                    <h3>Por favor inicia sesión o regístrate para acceder a los libros</h3>
+                </div>
+            `;
+        }
         
         // Book loading and download functionality
-        async function loadBooks() {
+        function loadBooks() {
             booksContainer.innerHTML = '';
             
             for (const [bookId, bookData] of Object.entries(books)) {
@@ -686,61 +551,16 @@
                     </div>
                     <div class="book-info">
                         <p>${bookData.description}</p>
-                        <button class="download-btn" data-book="${bookId}">Descargar PDF</button>
+                        <a href="${bookData.downloadUrl}" class="download-btn" download="${bookData.title.replace(/ /g, '_')}.pdf">Descargar PDF</a>
                     </div>
                 `;
                 
                 booksContainer.appendChild(bookCard);
             }
-            
-            // Add event listeners to download buttons
-            document.querySelectorAll('.download-btn').forEach(button => {
-                button.addEventListener('click', async function() {
-                    const bookId = this.getAttribute('data-book');
-                    downloadBook(bookId);
-                });
-            });
         }
         
-        async function downloadBook(bookId) {
-            try {
-                // Get the download URL
-                const storageRef = storage.ref();
-                const fileRef = storageRef.child(`books/${bookId}.pdf`);
-                const url = await fileRef.getDownloadURL();
-                
-                // Create a temporary anchor element to trigger the download
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${books[bookId].title}.pdf`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-            } catch (error) {
-                alert('Error al descargar el libro. Intenta nuevamente más tarde.');
-                console.error('Download error:', error);
-            }
-        }
-        
-        // Admin functionality - Upload PDFs
-        uploadForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const bookId = document.getElementById('bookSelect').value;
-            const file = document.getElementById('pdfFile').files[0];
-            
-            if (!bookId || !file) return;
-            
-            try {
-                const storageRef = storage.ref();
-                const fileRef = storageRef.child(`books/${bookId}.pdf`);
-                await fileRef.put(file);
-                alert('Libro subido exitosamente!');
-                uploadForm.reset();
-            } catch (error) {
-                alert('Error al subir el archivo. Intenta nuevamente.');
-                console.error('Upload error:', error);
-            }
-        });
+        // Initialize
+        updateAuthState();
     </script>
 </body>
 </html>
