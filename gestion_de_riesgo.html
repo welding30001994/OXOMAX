@@ -1,50 +1,75 @@
-
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Curso Básico de Trading | TradingPro</title>
+    <title>Curso Básico de Trading | Oxomax-Trading</title>
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <!-- Estilos -->
     <style>
         :root {
-            --primary: #2563eb;
-            --secondary: #1e40af;
-            --accent: #3b82f6;
-            --dark: #1e293b;
-            --light: #f8fafc;
-            --success: #10b981;
+            --primary: #00f7ff;
+            --primary-dark: #00c2c8;
+            --secondary: #7b2dff;
+            --dark: #0a0a1a;
+            --darker: #050510;
+            --light: #f0f0f0;
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --neon-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary), 0 0 30px var(--primary-dark);
+            --success: #00ffaa;
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            background-color: #f1f5f9;
-            color: var(--dark);
-            line-height: 1.6;
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--dark);
+            color: var(--light);
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(123, 45, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(0, 247, 255, 0.1) 0%, transparent 50%);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        h1, h2, h3, h4, .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            letter-spacing: 1px;
         }
         
         .container {
+            width: 100%;
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 20px;
         }
         
+        /* Header */
         header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 1rem 0;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 20px 0;
+            background: rgba(10, 10, 26, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
         }
         
         nav {
@@ -54,31 +79,49 @@
         }
         
         .logo {
-            font-size: 1.8rem;
-            font-weight: bold;
             display: flex;
             align-items: center;
-            gap: 10px;
+            font-size: 1.5rem;
+            color: var(--primary);
+            text-decoration: none;
         }
         
         .logo i {
-            color: var(--accent);
+            margin-right: 10px;
+            font-size: 1.8rem;
+            color: var(--primary);
         }
         
         .nav-links {
             display: flex;
-            gap: 20px;
+            gap: 30px;
         }
         
         .nav-links a {
-            color: white;
+            color: var(--light);
             text-decoration: none;
             font-weight: 500;
+            position: relative;
             transition: all 0.3s ease;
         }
         
         .nav-links a:hover {
-            color: var(--accent);
+            color: var(--primary);
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-links a:hover::after {
+            width: 100%;
         }
         
         .user-menu {
@@ -87,247 +130,252 @@
             gap: 15px;
         }
         
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: var(--accent);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        
         .logout-btn {
+            padding: 10px 20px;
             background: transparent;
-            border: 1px solid white;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 4px;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            border-radius: 30px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
         }
         
         .logout-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--primary);
+            color: var(--dark);
+            box-shadow: var(--neon-shadow);
         }
         
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0, 247, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-weight: bold;
+            border: 1px solid var(--glass-border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(0, 247, 255, 0.5);
+        }
+        
+        /* Dashboard */
         .dashboard {
-            padding: 2rem 0;
+            padding-top: 100px;
+            padding-bottom: 50px;
         }
         
         .welcome-banner {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 2rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .welcome-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 247, 255, 0.1), rgba(123, 45, 255, 0.1)));
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .welcome-banner:hover::before {
+            opacity: 1;
         }
         
         .welcome-text h2 {
             font-size: 1.8rem;
-            margin-bottom: 0.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .welcome-text p {
+            opacity: 0.8;
         }
         
         .progress-container {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 20px;
+            min-width: 250px;
         }
         
         .progress-bar {
             width: 100%;
-            height: 10px;
-            background-color: #e2e8f0;
-            border-radius: 5px;
-            margin-top: 0.5rem;
+            height: 8px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            margin: 10px 0;
             overflow: hidden;
         }
         
         .progress-fill {
             height: 100%;
-            background-color: var(--success);
+            background: var(--gradient);
             width: 0%;
             transition: width 0.5s ease;
         }
         
-        .course-modules {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-top: 2rem;
-        }
-        
-        .module-card {
-            background: white;
-            border-radius: 8px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .module-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .module-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-        
-        .module-icon {
-            width: 50px;
-            height: 50px;
-            background-color: rgba(37, 99, 235, 0.1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary);
-            font-size: 1.2rem;
-        }
-        
-        .module-status {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-        
-        .status-completed {
-            background-color: rgba(16, 185, 129, 0.1);
-            color: var(--success);
-        }
-        
-        .status-pending {
-            background-color: rgba(234, 179, 8, 0.1);
-            color: #d97706;
-        }
-        
-        .module-card h3 {
-            font-size: 1.2rem;
-            margin-bottom: 0.5rem;
-            color: var(--dark);
-        }
-        
-        .module-card p {
-            color: #64748b;
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-        }
-        
-        .module-meta {
-            display: flex;
-            justify-content: space-between;
-            color: #64748b;
-            font-size: 0.8rem;
-        }
-        
-        .module-lessons {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .module-duration {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
+        /* Content Container */
         .content-container {
             display: flex;
-            gap: 2rem;
-            margin-top: 2rem;
+            gap: 30px;
+            margin-top: 30px;
         }
         
+        /* Sidebar */
         .sidebar {
             width: 300px;
             flex-shrink: 0;
         }
         
         .sidebar-menu {
-            background: white;
-            border-radius: 8px;
-            padding: 1rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .sidebar-menu::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 247, 255, 0.1), rgba(123, 45, 255, 0.1)));
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .sidebar-menu:hover::before {
+            opacity: 1;
         }
         
         .sidebar-menu h3 {
-            font-size: 1.1rem;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid #e2e8f0;
-            color: var(--dark);
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--glass-border);
+            color: var(--primary);
         }
         
         .menu-item {
-            padding: 0.5rem 0;
-            border-bottom: 1px solid #f1f5f9;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        
+        .menu-item:last-child {
+            border-bottom: none;
         }
         
         .menu-item a {
-            color: #64748b;
+            color: var(--light);
             text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
             transition: all 0.3s ease;
+            opacity: 0.8;
         }
         
         .menu-item a:hover {
             color: var(--primary);
+            opacity: 1;
         }
         
         .menu-item.active a {
             color: var(--primary);
             font-weight: 500;
+            opacity: 1;
         }
         
         .menu-item i {
+            font-size: 1.1rem;
             width: 20px;
             text-align: center;
         }
         
+        /* Main Content */
         .main-content {
             flex-grow: 1;
-            background: white;
-            border-radius: 8px;
-            padding: 2rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .main-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 247, 255, 0.1), rgba(123, 45, 255, 0.1)));
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .main-content:hover::before {
+            opacity: 1;
         }
         
         .content-header {
-            margin-bottom: 1.5rem;
+            margin-bottom: 25px;
         }
         
         .content-header h2 {
-            font-size: 1.5rem;
-            color: var(--dark);
-            margin-bottom: 0.5rem;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: var(--primary);
         }
         
         .breadcrumbs {
             display: flex;
-            gap: 5px;
+            gap: 8px;
             font-size: 0.9rem;
-            color: #64748b;
+            color: var(--light);
+            opacity: 0.7;
         }
         
         .breadcrumbs a {
-            color: #64748b;
+            color: var(--light);
             text-decoration: none;
+            transition: all 0.3s ease;
         }
         
         .breadcrumbs a:hover {
@@ -335,98 +383,205 @@
         }
         
         .breadcrumbs span {
-            color: var(--dark);
+            color: var(--primary);
         }
         
+        /* Lesson Content */
         .lesson-content {
             line-height: 1.7;
         }
         
         .lesson-content h3 {
-            font-size: 1.3rem;
-            margin: 1.5rem 0 1rem;
-            color: var(--dark);
+            font-size: 1.4rem;
+            margin: 25px 0 15px;
+            color: var(--primary);
         }
         
         .lesson-content p {
-            margin-bottom: 1rem;
+            margin-bottom: 15px;
+            opacity: 0.9;
         }
         
         .lesson-content ul, .lesson-content ol {
-            margin-bottom: 1rem;
-            padding-left: 1.5rem;
+            margin-bottom: 20px;
+            padding-left: 20px;
+            opacity: 0.9;
         }
         
         .lesson-content li {
-            margin-bottom: 0.5rem;
+            margin-bottom: 8px;
         }
         
         .lesson-content img {
             max-width: 100%;
             height: auto;
-            border-radius: 8px;
-            margin: 1rem 0;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow);
         }
         
+        /* Lesson Navigation */
         .lesson-nav {
             display: flex;
             justify-content: space-between;
-            margin-top: 2rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid #e2e8f0;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--glass-border);
         }
         
         .nav-button {
-            padding: 10px 20px;
-            background-color: var(--primary);
-            color: white;
+            padding: 12px 25px;
+            background: var(--primary);
+            color: var(--dark);
             border: none;
-            border-radius: 4px;
-            font-weight: 500;
+            border-radius: 30px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .nav-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, var(--primary-dark), var(--secondary));
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
         
         .nav-button:hover {
-            background-color: var(--secondary);
+            box-shadow: var(--neon-shadow);
+        }
+        
+        .nav-button:hover::before {
+            opacity: 1;
         }
         
         .nav-button.outline {
-            background-color: transparent;
-            border: 1px solid var(--primary);
+            background: transparent;
             color: var(--primary);
+            border: 1px solid var(--primary);
         }
         
         .nav-button.outline:hover {
-            background-color: rgba(37, 99, 235, 0.1);
+            background: rgba(0, 247, 255, 0.1);
         }
         
+        .nav-button i {
+            font-size: 1rem;
+        }
+        
+        /* Completion Checkbox */
         .completion-checkbox {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-top: 1.5rem;
-            padding: 1rem;
-            background-color: #f8fafc;
-            border-radius: 8px;
+            gap: 10px;
+            margin-top: 25px;
+            padding: 15px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
         }
         
         .completion-checkbox input {
             width: 18px;
             height: 18px;
+            accent-color: var(--primary);
         }
         
         .completion-checkbox label {
-            font-size: 0.9rem;
-            color: #64748b;
             cursor: pointer;
+            opacity: 0.9;
+            transition: all 0.3s ease;
         }
         
+        .completion-checkbox:hover label {
+            color: var(--primary);
+            opacity: 1;
+        }
+        
+        /* Efectos de partículas */
+        .particles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float linear infinite;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            50% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
+        }
+        
+        /* Responsive para móviles */
         @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+            
+            header {
+                padding: 15px 0;
+            }
+            
+            .logo {
+                font-size: 1.2rem;
+            }
+            
+            .logo i {
+                font-size: 1.5rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .dashboard {
+                padding-top: 80px;
+            }
+            
+            .welcome-banner {
+                flex-direction: column;
+                padding: 25px;
+                gap: 20px;
+            }
+            
+            .progress-container {
+                width: 100%;
+            }
+            
             .content-container {
                 flex-direction: column;
             }
@@ -435,25 +590,40 @@
                 width: 100%;
             }
             
-            .welcome-banner {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
+            .main-content {
+                padding: 20px;
             }
             
-            .progress-container {
+            .content-header h2 {
+                font-size: 1.5rem;
+            }
+            
+            .lesson-content h3 {
+                font-size: 1.2rem;
+            }
+            
+            .lesson-nav {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .nav-button {
                 width: 100%;
+                justify-content: center;
             }
         }
     </style>
 </head>
 <body>
+    <!-- Efecto de partículas -->
+    <div class="particles" id="particles"></div>
+    
     <header>
         <div class="container">
             <nav>
                 <div class="logo">
                     <i class="fas fa-chart-line"></i>
-                    <span>Oxomax-Trading</span>
+                    <span>OXOMAX-TRADING</span>
                 </div>
                 <div class="nav-links">
                     <a href="#" class="active">Curso</a>
@@ -483,25 +653,14 @@
                     <span id="progressText">0% completado</span>
                 </div>
             </div>
-            
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-    <!DOCTYPE html>
+
+
+
+
+
+
+
+ <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -716,31 +875,14 @@
         <!-- Botón de Google -->
         <a href="ordenblock.html " target="_blank" class="portal-btn btn-google">
             <i class="fab fa-google"></i>
-            ordenblock
+           MODULO-BASICO
         </a>
         
-        <!-- Botón de YouTube -->
-        <a href=" pattern.html" target="_blank" class="portal-btn btn-youtube">
-            <i class="fab fa-youtube"></i>
-            pattern
-        </a>
-        
-        <!-- Botón de GitHub -->
-        <a href="instalacion.html " target="_blank" class="portal-btn btn-github">
-            <i class="fab fa-github"></i>
-            instalacion
-        </a>
-        
-        <!-- Botón de Twitter -->
-        <a href=" sell.html" target="_blank" class="portal-btn btn-twitter">
-            <i class="fab fa-twitter"></i>
-           sell
-        </a>
         
         <!-- Botón de LinkedIn -->
         <a href="calculadora.HTML " target="_blank" class="portal-btn btn-linkedin">
-            <i class="fa-duotone fa-regular fa-calculator"></i>
-          Calculadora
+              <i class="fab fa-youtube"></i>
+          CALCULADORA
         </a>
         
         <!-- Botón de Instagram -->
@@ -748,9 +890,35 @@
             <i class="fab fa-instagram"></i>
             DEVEBUG
         </a>
+      <!-- Botón de Instagram -->
+        <a href="señales.html " target="_blank" class="portal-btn btn-instagram">
+             <i class="fab fa-github"></i>
+            SEÑALES
+        </a>
+              <!-- Botón de Instagram -->
+        <a href="https://pelisya.my.canva.site/pagosonline " target="_blank" class="portal-btn btn-instagram">
+           <i class="fab fa-twitter"></i>
+            PAGOS
+        </a>
+
+              <!-- Botón de Instagram -->
+        <a href="imagenes.html " target="_blank" class="portal-btn btn-instagram">
+              <i class="fab fa-google"></i>
+           FINANZAS
+        </a>
+
+
+
+
+
+
+
+        
     </div>
 
 
+
+  
 
 
 
@@ -847,11 +1015,49 @@
         });
     </script>
     
-          
-          
-          
-          
-          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
           
           <div class="content-container">
     <aside class="sidebar">
@@ -993,23 +1199,6 @@
 </div>
           
           
-          
-     
-
-
-
-
-
-
-
-
-
-
-
-
-
-    </main>
-
     <script>
         // Inicializar Firebase
         const firebaseConfig = {
@@ -1034,6 +1223,35 @@
         const progressFill = document.getElementById('progressFill');
         const progressText = document.getElementById('progressText');
         const completeLesson = document.getElementById('completeLesson');
+        const particlesContainer = document.getElementById('particles');
+        
+        // Crear efecto de partículas
+        function createParticles() {
+            const particleCount = 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Tamaño aleatorio entre 2px y 6px
+                const size = Math.random() * 4 + 2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Posición inicial aleatoria
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.bottom = `-${size}px`;
+                
+                // Duración de la animación aleatoria
+                const duration = Math.random() * 20 + 10;
+                particle.style.animationDuration = `${duration}s`;
+                
+                // Retraso aleatorio
+                particle.style.animationDelay = `${Math.random() * 10}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
         
         // Verificar autenticación al cargar la página
         auth.onAuthStateChanged((user) => {
@@ -1088,9 +1306,11 @@
             }
         });
         
-        // Simular progreso inicial (esto sería reemplazado por tu lógica real)
-        window.addEventListener('DOMContentLoaded', () => {
-            // Animación de la barra de progreso
+        // Crear partículas al cargar la página
+        window.addEventListener('load', () => {
+            createParticles();
+            
+            // Animación inicial de la barra de progreso
             setTimeout(() => {
                 progressFill.style.width = '15%';
                 progressText.textContent = '15% completado';
