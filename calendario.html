@@ -3,14 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendario de Pagos Futurista - MultiUsuario</title>
+    <title>Calendario de Pagos Futurista</title>
     <style>
         :root {
             --neon-blue: #0ff0fc;
             --neon-purple: #9600ff;
-            --neon-green: #00ff88;
-            --neon-pink: #ff00e4;
-            --neon-red: #ff0033;
             --dark-bg: #0a0a1a;
             --card-bg: rgba(15, 15, 35, 0.8);
             --text-color: #e0e0ff;
@@ -41,93 +38,6 @@
             .container {
                 max-width: 800px;
             }
-        }
-
-        /* Login form */
-        .login-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .login-form {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 25px;
-            width: 100%;
-            max-width: 400px;
-            border: 1px solid rgba(0, 247, 255, 0.2);
-            box-shadow: 0 0 20px rgba(0, 247, 255, 0.2);
-            text-align: center;
-        }
-
-        .login-form h2 {
-            color: var(--neon-blue);
-            margin-top: 0;
-            margin-bottom: 20px;
-            text-shadow: 0 0 8px rgba(0, 247, 255, 0.5);
-        }
-
-        .login-form input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(0, 247, 255, 0.3);
-            border-radius: 5px;
-            color: white;
-            font-size: 1rem;
-        }
-
-        .login-form button {
-            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            width: 100%;
-            transition: all 0.3s;
-            font-size: 1rem;
-        }
-
-        .login-form button:hover {
-            box-shadow: 0 0 15px var(--neon-blue);
-        }
-
-        .user-info {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(0, 247, 255, 0.2);
-            box-shadow: 0 0 15px rgba(0, 247, 255, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .user-info span {
-            color: var(--neon-green);
-            font-weight: bold;
-        }
-
-        .logout-btn {
-            background: rgba(255, 0, 51, 0.2);
-            border: 1px solid var(--neon-red);
-            color: var(--neon-red);
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .logout-btn:hover {
-            background: rgba(255, 0, 51, 0.4);
-            box-shadow: 0 0 10px var(--neon-red);
         }
 
         /* Estilo para la sección de información bancaria */
@@ -429,13 +339,6 @@
 
         .record-content {
             font-size: 0.9rem;
-            margin-bottom: 5px;
-        }
-
-        .record-author {
-            font-size: 0.7rem;
-            color: var(--neon-green);
-            font-style: italic;
         }
 
         .record-delete {
@@ -453,10 +356,6 @@
             justify-content: center;
             cursor: pointer;
             font-size: 0.7rem;
-        }
-
-        .record-delete:hover {
-            background: rgba(255, 0, 0, 0.6);
         }
 
         /* Floating particles */
@@ -567,25 +466,7 @@
     <!-- Floating particles -->
     <div class="particles" id="particles"></div>
     
-    <!-- Login Screen -->
-    <div class="login-container" id="loginScreen">
-        <div class="login-form">
-            <h2>Iniciar Sesión</h2>
-            <input type="text" id="usernameInput" placeholder="Nombre de usuario">
-            <input type="password" id="passwordInput" placeholder="Contraseña">
-            <button id="loginBtn">Ingresar</button>
-            <p style="margin-top: 15px; font-size: 0.9rem;">Usuarios demo: admin (contraseña: admin) o usuario (contraseña: 123)</p>
-        </div>
-    </div>
-    
-    <!-- Main App (hidden by default) -->
-    <div class="container" id="appContainer" style="display: none;">
-        <!-- User info -->
-        <div class="user-info">
-            <div>Conectado como: <span id="currentUsername"></span></div>
-            <button class="logout-btn" id="logoutBtn">Cerrar Sesión</button>
-        </div>
-        
+    <div class="container">
         <!-- Sección de información bancaria -->
         <div class="bank-info">
             <h2>BANCO PICHINCHA</h2>
@@ -680,42 +561,16 @@
         let selectedDate = null;
         let selectedWeek = null;
         let paymentType = 'inscription'; // 'inscription' o 'monthly'
-        let currentUser = null;
-        
-        // Datos de usuarios (en un sistema real esto estaría en una base de datos)
-        const users = {
-            'admin': { password: 'admin', isAdmin: true },
-            'usuario': { password: '123', isAdmin: false }
-        };
-        
-        // Datos de pagos (en un sistema real esto estaría en una base de datos)
         let paymentRecords = JSON.parse(localStorage.getItem('paymentRecords')) || {
             inscription: [],
             monthly: []
         };
 
-        // Inicializar la aplicación
+        // Inicializar el calendario
         document.addEventListener('DOMContentLoaded', function() {
             createParticles();
-            
-            // Verificar si hay un usuario logueado
-            const savedUser = localStorage.getItem('currentUser');
-            if (savedUser) {
-                currentUser = JSON.parse(savedUser);
-                showApp();
-            }
-            
-            // Configurar event listeners
-            setupEventListeners();
-        });
-
-        // Mostrar la aplicación (ocultar login)
-        function showApp() {
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('appContainer').style.display = 'block';
-            document.getElementById('currentUsername').textContent = currentUser.username;
-            
             renderCalendar();
+            setupEventListeners();
             renderPaymentRecords();
             
             // Configurar botones de tipo de pago
@@ -730,7 +585,7 @@
                 this.classList.add('active');
                 document.getElementById('inscriptionBtn').classList.remove('active');
             });
-        }
+        });
 
         // Renderizar el calendario
         function renderCalendar() {
@@ -809,14 +664,14 @@
                 inscriptionNotes.forEach(note => {
                     const notePreview = document.createElement('div');
                     notePreview.classList.add('client-note', 'inscription-note');
-                    notePreview.textContent = `Inscripción: ${note.author.substring(0, 3)}...`;
+                    notePreview.textContent = `Inscripción: ${note.content.substring(0, 10)}...`;
                     dayElement.appendChild(notePreview);
                 });
                 
                 monthlyNotes.forEach(note => {
                     const notePreview = document.createElement('div');
                     notePreview.classList.add('client-note', 'monthly-note');
-                    notePreview.textContent = `Mensualidad: ${note.author.substring(0, 3)}...`;
+                    notePreview.textContent = `Mensualidad: ${note.content.substring(0, 10)}...`;
                     dayElement.appendChild(notePreview);
                 });
                 
@@ -900,39 +755,6 @@
 
         // Configurar event listeners
         function setupEventListeners() {
-            // Login
-            document.getElementById('loginBtn').addEventListener('click', function() {
-                const username = document.getElementById('usernameInput').value.trim();
-                const password = document.getElementById('passwordInput').value.trim();
-                
-                if (!username || !password) {
-                    alert('Por favor ingrese usuario y contraseña');
-                    return;
-                }
-                
-                if (users[username] && users[username].password === password) {
-                    currentUser = {
-                        username: username,
-                        isAdmin: users[username].isAdmin
-                    };
-                    
-                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                    showApp();
-                } else {
-                    alert('Usuario o contraseña incorrectos');
-                }
-            });
-            
-            // Logout
-            document.getElementById('logoutBtn').addEventListener('click', function() {
-                currentUser = null;
-                localStorage.removeItem('currentUser');
-                document.getElementById('loginScreen').style.display = 'flex';
-                document.getElementById('appContainer').style.display = 'none';
-                document.getElementById('usernameInput').value = '';
-                document.getElementById('passwordInput').value = '';
-            });
-            
             // Navegación del calendario
             document.getElementById('prevMonth').addEventListener('click', function() {
                 currentDate.setMonth(currentDate.getMonth() - 1);
@@ -977,7 +799,6 @@
                 id: Date.now().toString(),
                 date: dateKey,
                 content: content,
-                author: currentUser.username,
                 timestamp: new Date().toISOString()
             };
             
@@ -1031,20 +852,10 @@
             recordElement.innerHTML = `
                 <div class="record-date">${formattedDate}</div>
                 <div class="record-content">${record.content}</div>
-                <div class="record-author">Registrado por: ${record.author}</div>
+                <button class="record-delete" onclick="deletePaymentRecord('${record.id}', '${type}')">
+                    <i class="fas fa-trash"></i>
+                </button>
             `;
-            
-            // Solo mostrar botón de eliminar si el usuario es el autor o es admin
-            if (currentUser && (currentUser.username === record.author || currentUser.isAdmin)) {
-                const deleteBtn = document.createElement('button');
-                deleteBtn.classList.add('record-delete');
-                deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
-                deleteBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    deletePaymentRecord(record.id, type);
-                };
-                recordElement.appendChild(deleteBtn);
-            }
             
             return recordElement;
         }
