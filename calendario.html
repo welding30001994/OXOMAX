@@ -154,6 +154,7 @@
             cursor: pointer;
             transition: all 0.3s;
             position: relative;
+            overflow: hidden;
         }
 
         .calendar-day:hover {
@@ -458,6 +459,72 @@
             
             .day-number {
                 margin-bottom: 2px;
+            }
+        }
+
+        /* Mejoras adicionales de responsividad */
+        @media (max-width: 480px) {
+            .calendar-day {
+                min-height: 40px;
+                padding: 3px;
+            }
+            
+            .day-number {
+                font-size: 0.7rem;
+                margin-bottom: 2px;
+            }
+            
+            .client-note {
+                font-size: 0.55rem;
+                padding: 1px 2px;
+            }
+            
+            .bank-info p {
+                font-size: 0.75rem;
+                padding: 5px 0;
+            }
+            
+            .edit-panel h3 {
+                font-size: 1rem;
+            }
+            
+            .payment-type button {
+                padding: 5px 8px;
+                font-size: 0.7rem;
+            }
+        }
+
+        @media (max-width: 350px) {
+            .calendar-day {
+                min-height: 35px;
+            }
+            
+            .weekday {
+                font-size: 0.7rem;
+            }
+            
+            .bank-info h2 {
+                font-size: 1.1rem;
+            }
+            
+            .bank-info p {
+                font-size: 0.7rem;
+            }
+            
+            .records-column {
+                padding: 10px;
+            }
+            
+            .record-item {
+                padding: 8px;
+            }
+            
+            .record-date {
+                font-size: 0.8rem;
+            }
+            
+            .record-content {
+                font-size: 0.75rem;
             }
         }
     </style>
@@ -874,6 +941,9 @@
                 renderPaymentRecords();
             }
         }
+        
+        // Hacer la función accesible globalmente
+        window.deletePaymentRecord = deletePaymentRecord;
     </script>
 </body>
 </html>
