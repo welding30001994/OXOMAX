@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OXOMAX-TRADING </title>
+    <title>XAUUSD PRO | TradingView + Calculadora OXOMAX</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
@@ -121,7 +121,7 @@
         
         .chart-container {
             width: 100%;
-            height: 60vh;
+            height: 70vh; /* Aumentado para más espacio */
             min-height: 500px;
             background: rgba(10, 10, 32, 0.7);
             border-radius: 15px;
@@ -137,40 +137,7 @@
         }
         
         .timeframe-selector {
-            display: flex;
-            gap: 10px;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 10px;
-            border-radius: 10px;
-            border: 1px solid rgba(0, 247, 255, 0.2);
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        
-        .timeframe-btn {
-            background: transparent;
-            color: var(--light);
-            border: 1px solid rgba(0, 247, 255, 0.3);
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.9rem;
-            min-width: 50px;
-            text-align: center;
-        }
-        
-        .timeframe-btn.active {
-            background: var(--accent);
-            color: white;
-            border-color: var(--accent);
-            box-shadow: 0 0 10px var(--accent);
-        }
-        
-        .timeframe-btn:hover {
-            border-color: var(--primary);
+            display: none; /* Ocultamos el selector de timeframes */
         }
         
         /* Estilos para la calculadora OXOMAX */
@@ -419,10 +386,6 @@
             .container {
                 width: 98%;
             }
-            
-            .chart-container {
-                height: 50vh;
-            }
         }
         
         @media (max-width: 768px) {
@@ -445,18 +408,8 @@
             }
             
             .chart-container {
-                height: 45vh;
+                height: 65vh; /* Más alto en móviles */
                 min-height: 400px;
-            }
-            
-            .timeframe-selector {
-                gap: 5px;
-            }
-            
-            .timeframe-btn {
-                padding: 6px 10px;
-                font-size: 0.8rem;
-                min-width: 40px;
             }
         }
         
@@ -470,7 +423,7 @@
             }
             
             .chart-container {
-                height: 40vh;
+                height: 60vh; /* Ajuste para móviles pequeños */
                 min-height: 350px;
             }
             
@@ -481,6 +434,15 @@
             .input-group input {
                 padding: 10px;
             }
+            
+            .logo {
+                font-size: 1.5rem;
+            }
+            
+            .auth-buttons button {
+                padding: 6px 15px;
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
@@ -490,7 +452,7 @@
     
     <div class="container">
         <header>
-            <div class="logo">Oxomax<span class="glow">Trading</span></div>
+            <div class="logo">XAUUSD<span class="glow">PRO</span></div>
             <div class="auth-buttons">
                 <button id="loginBtn">INICIAR SESIÓN</button>
                 <button id="registerBtn">REGISTRARSE</button>
@@ -499,7 +461,7 @@
         </header>
         
         <div class="hero">
-            <h1>Analisis de entrada</h1>
+            <h1>ANÁLISIS MULTI-TIMEFRAME XAUUSD</h1>
         </div>
         
         <div id="tradingApp">
@@ -705,16 +667,6 @@
         // Initialize TradingView Widget
         function initTradingView() {
             tradingApp.innerHTML = `
-                <div class="timeframe-selector">
-                    <button class="timeframe-btn ${currentTimeframe === '1' ? 'active' : ''}" data-tf="1">1m</button>
-                    <button class="timeframe-btn ${currentTimeframe === '5' ? 'active' : ''}" data-tf="5">5m</button>
-                    <button class="timeframe-btn ${currentTimeframe === '15' ? 'active' : ''}" data-tf="15">15m</button>
-                    <button class="timeframe-btn ${currentTimeframe === '30' ? 'active' : ''}" data-tf="30">30m</button>
-                    <button class="timeframe-btn ${currentTimeframe === '60' ? 'active' : ''}" data-tf="60">1h</button>
-                    <button class="timeframe-btn ${currentTimeframe === '240' ? 'active' : ''}" data-tf="240">4h</button>
-                    <button class="timeframe-btn ${currentTimeframe === '1D' ? 'active' : ''}" data-tf="1D">1D</button>
-                </div>
-                
                 <div class="chart-container">
                     <div id="tradingview-chart"></div>
                 </div>
@@ -779,27 +731,6 @@
                     "mainSeriesProperties.candleStyle.wickDownColor": "#ff3860",
                     "scalesProperties.textColor": "rgba(224, 224, 255, 0.7)"
                 }
-            });
-            
-            // Manejar cambio de timeframe
-            document.querySelectorAll('.timeframe-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const newTimeframe = this.dataset.tf;
-                    if (newTimeframe !== currentTimeframe) {
-                        currentTimeframe = newTimeframe;
-                        
-                        // Actualizar botón activo
-                        document.querySelectorAll('.timeframe-btn').forEach(b => b.classList.remove('active'));
-                        this.classList.add('active');
-                        
-                        // Cambiar timeframe en el gráfico
-                        if (tvWidget) {
-                            tvWidget.chart().setResolution(newTimeframe, () => {
-                                console.log(`Timeframe cambiado a ${newTimeframe}`);
-                            });
-                        }
-                    }
-                });
             });
         }
         
