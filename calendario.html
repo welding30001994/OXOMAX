@@ -3,1111 +3,877 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Calendar - Futuro Organizado</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Calendario de Pagos Futurista</title>
     <style>
         :root {
-            --primary: #00ff9d;
-            --secondary: #00b4ff;
-            --dark: #0a192f;
-            --darker: #020c1b;
-            --light: #ccd6f6;
-            --danger: #ff3860;
-            --warning: #ffdd57;
+            --neon-blue: #0ff0fc;
+            --neon-purple: #9600ff;
+            --dark-bg: #0a0a1a;
+            --card-bg: rgba(15, 15, 35, 0.8);
+            --text-color: #e0e0ff;
+            --inscription-color: #00ff88;
+            --monthly-color: #ff00e4;
         }
-
-        * {
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-color);
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: var(--dark);
-            color: var(--light);
-            line-height: 1.6;
-        }
-
-        .futuristic {
-            font-family: 'Orbitron', sans-serif;
-            letter-spacing: 1px;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(150, 0, 255, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0, 255, 252, 0.1) 0%, transparent 20%);
         }
 
         .container {
-            width: 95%;
-            max-width: 1200px;
+            max-width: 100%;
+            padding: 15px;
+            box-sizing: border-box;
             margin: 0 auto;
-            padding: 20px;
         }
 
-        /* Header */
-        header {
-            background: linear-gradient(135deg, var(--darker), var(--dark));
-            padding: 20px 0;
-            border-bottom: 1px solid rgba(0, 255, 157, 0.2);
-            position: relative;
-            z-index: 100;
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .logo i {
-            color: var(--primary);
-            font-size: 2rem;
-        }
-
-        .logo h1 {
-            font-size: 1.8rem;
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .auth-buttons button {
-            background: transparent;
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            padding: 8px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-left: 10px;
-        }
-
-        .auth-buttons button:hover {
-            background: var(--primary);
-            color: var(--dark);
-        }
-
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: var(--secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        /* Main Layout */
-        .main-grid {
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 30px;
-            margin-top: 30px;
-        }
-
-        @media (max-width: 768px) {
-            .main-grid {
-                grid-template-columns: 1fr;
+        @media (min-width: 768px) {
+            .container {
+                max-width: 800px;
             }
         }
 
-        /* Sidebar */
-        .sidebar {
-            background: rgba(10, 25, 47, 0.8);
-            border-radius: 10px;
-            padding: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(0, 180, 255, 0.1);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        /* Estilo para la sección de información bancaria */
+        .bank-info {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(0, 247, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 247, 255, 0.1);
+            position: relative;
+            overflow: hidden;
         }
 
-        .sidebar-section {
-            margin-bottom: 30px;
+        .bank-info::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            z-index: -1;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            border-radius: 14px;
+            opacity: 0.3;
         }
 
-        .sidebar-title {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .bank-info h2 {
+            color: var(--neon-blue);
+            text-align: center;
+            margin-top: 0;
+            font-size: 1.5rem;
+            text-shadow: 0 0 8px rgba(0, 247, 255, 0.5);
         }
 
-        .sidebar-title i {
+        .bank-info p {
+            margin: 10px 0;
+            padding: 8px 0;
+            border-bottom: 1px dashed rgba(0, 247, 255, 0.3);
             font-size: 1rem;
+            text-align: center;
         }
 
-        /* Calendar */
+        .bank-info p:last-child {
+            border-bottom: none;
+        }
+
+        /* Estilos para el calendario */
         .calendar-container {
-            background: rgba(10, 25, 47, 0.8);
-            border-radius: 10px;
-            padding: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(0, 180, 255, 0.1);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid rgba(0, 247, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 247, 255, 0.1);
+            margin-bottom: 20px;
         }
 
         .calendar-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .calendar-title {
-            font-size: 1.5rem;
-            color: var(--primary);
-        }
-
-        .calendar-nav {
-            display: flex;
-            gap: 10px;
+            font-size: 1.3rem;
+            color: var(--neon-blue);
+            text-shadow: 0 0 8px rgba(0, 247, 255, 0.5);
         }
 
         .calendar-nav button {
-            background: transparent;
-            border: 1px solid var(--secondary);
-            color: var(--secondary);
-            width: 30px;
-            height: 30px;
-            border-radius: 4px;
+            background: rgba(0, 247, 255, 0.1);
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            padding: 5px 10px;
+            border-radius: 5px;
             cursor: pointer;
+            margin: 0 5px;
             transition: all 0.3s;
         }
 
         .calendar-nav button:hover {
-            background: var(--secondary);
-            color: var(--dark);
+            background: rgba(0, 247, 255, 0.3);
+            box-shadow: 0 0 10px var(--neon-blue);
         }
 
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 10px;
+            gap: 5px;
         }
 
-        .calendar-day-header {
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .weekday {
             text-align: center;
-            padding: 10px;
-            color: var(--secondary);
             font-weight: bold;
+            color: var(--neon-blue);
+            padding: 5px;
+            font-size: 0.9rem;
         }
 
         .calendar-day {
-            aspect-ratio: 1;
-            background: rgba(0, 180, 255, 0.05);
-            border: 1px solid rgba(0, 180, 255, 0.1);
-            border-radius: 4px;
-            padding: 5px;
+            background: rgba(10, 20, 30, 0.5);
+            border: 1px solid rgba(0, 247, 255, 0.1);
+            border-radius: 5px;
+            padding: 8px;
+            min-height: 60px;
             cursor: pointer;
             transition: all 0.3s;
             position: relative;
         }
 
         .calendar-day:hover {
-            background: rgba(0, 180, 255, 0.2);
-            transform: translateY(-3px);
+            background: rgba(0, 247, 255, 0.1);
+            border-color: var(--neon-blue);
         }
 
-        .calendar-day-number {
-            font-size: 0.9rem;
+        .day-number {
             font-weight: bold;
+            margin-bottom: 5px;
         }
 
-        .calendar-day.today {
-            background: rgba(0, 255, 157, 0.1);
-            border-color: var(--primary);
+        .today {
+            background: rgba(0, 247, 255, 0.2);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 10px var(--neon-blue);
         }
 
-        .calendar-day.selected {
-            background: var(--primary);
-            color: var(--dark);
-            font-weight: bold;
+        .selected-week {
+            background: rgba(150, 0, 255, 0.2);
+            border-color: var(--neon-purple);
+            box-shadow: 0 0 10px var(--neon-purple);
         }
 
-        .calendar-day.other-month {
-            opacity: 0.3;
-        }
-
-        .calendar-event {
+        .client-note {
             font-size: 0.7rem;
-            background: var(--secondary);
-            color: var(--dark);
-            padding: 2px 4px;
+            padding: 2px 5px;
+            margin-top: 3px;
             border-radius: 2px;
-            margin-top: 2px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        /* Payment Form */
-        .payment-form {
-            background: rgba(10, 25, 47, 0.8);
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 30px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(0, 180, 255, 0.1);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        .inscription-note {
+            background: rgba(0, 255, 136, 0.1);
+            border-left: 2px solid var(--inscription-color);
         }
 
-        .form-title {
-            font-size: 1.5rem;
+        .monthly-note {
+            background: rgba(255, 0, 228, 0.1);
+            border-left: 2px solid var(--monthly-color);
+        }
+
+        /* Panel de edición */
+        .edit-panel {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid rgba(0, 247, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 247, 255, 0.1);
             margin-bottom: 20px;
-            color: var(--primary);
         }
 
-        .form-group {
+        .edit-panel h3 {
+            color: var(--neon-blue);
+            margin-top: 0;
+            font-size: 1.2rem;
+        }
+
+        .payment-type {
+            display: flex;
+            justify-content: space-around;
             margin-bottom: 15px;
         }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: var(--secondary);
+        .payment-type button {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
         }
 
-        .form-control {
+        .payment-type button.active {
+            box-shadow: 0 0 10px;
+        }
+
+        #inscriptionBtn {
+            border-color: var(--inscription-color);
+            color: var(--inscription-color);
+        }
+
+        #inscriptionBtn.active {
+            background: rgba(0, 255, 136, 0.2);
+            box-shadow: 0 0 10px var(--inscription-color);
+        }
+
+        #monthlyBtn {
+            border-color: var(--monthly-color);
+            color: var(--monthly-color);
+        }
+
+        #monthlyBtn.active {
+            background: rgba(255, 0, 228, 0.2);
+            box-shadow: 0 0 10px var(--monthly-color);
+        }
+
+        .edit-panel textarea {
             width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 247, 255, 0.3);
+            border-radius: 5px;
             padding: 10px;
-            background: rgba(0, 180, 255, 0.05);
-            border: 1px solid rgba(0, 180, 255, 0.2);
-            border-radius: 4px;
-            color: var(--light);
-            font-family: 'Roboto', sans-serif;
+            color: white;
+            margin-bottom: 10px;
+            min-height: 100px;
+            resize: vertical;
         }
 
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .btn {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: var(--dark);
+        .edit-panel button {
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
+            padding: 8px 15px;
+            border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
             transition: all 0.3s;
         }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 255, 157, 0.3);
+        .edit-panel button:hover {
+            box-shadow: 0 0 15px var(--neon-blue);
         }
 
-        .btn-danger {
-            background: var(--danger);
-            color: white;
+        /* Registros de pagos */
+        .records-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
         }
 
-        /* Comments Section */
-        .comments-section {
-            background: rgba(10, 25, 47, 0.8);
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 30px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(0, 180, 255, 0.1);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        @media (min-width: 600px) {
+            .records-container {
+                grid-template-columns: 1fr 1fr;
+            }
         }
 
-        .comments-list {
-            margin-top: 20px;
-        }
-
-        .comment {
-            background: rgba(0, 180, 255, 0.05);
-            border-left: 3px solid var(--secondary);
+        .records-column {
+            background: var(--card-bg);
+            border-radius: 12px;
             padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 0 4px 4px 0;
+            border: 1px solid rgba(0, 247, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 247, 255, 0.1);
         }
 
-        .comment-header {
-            display: flex;
-            justify-content: space-between;
+        .records-column h3 {
+            color: var(--neon-blue);
+            margin-top: 0;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        .records-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .record-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            padding: 10px;
             margin-bottom: 10px;
-            font-size: 0.9rem;
+            position: relative;
         }
 
-        .comment-user {
+        .record-item.inscription {
+            border-left: 3px solid var(--inscription-color);
+        }
+
+        .record-item.monthly {
+            border-left: 3px solid var(--monthly-color);
+        }
+
+        .record-date {
             font-weight: bold;
-            color: var(--primary);
-        }
-
-        .comment-date {
-            color: var(--secondary);
-            opacity: 0.8;
-        }
-
-        .comment-content {
-            font-size: 0.95rem;
-        }
-
-        /* Payments List */
-        .payments-list {
-            margin-top: 20px;
-        }
-
-        .payment-item {
-            background: rgba(0, 180, 255, 0.05);
-            border-left: 3px solid var(--primary);
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 0 4px 4px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .payment-info h4 {
-            color: var(--primary);
+            color: var(--neon-blue);
             margin-bottom: 5px;
         }
 
-        .payment-details {
-            display: flex;
-            gap: 15px;
+        .record-content {
             font-size: 0.9rem;
         }
 
-        .payment-amount {
-            font-weight: bold;
-        }
-
-        .payment-status {
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-
-        .status-paid {
-            background: rgba(0, 255, 157, 0.1);
-            color: var(--primary);
-        }
-
-        .status-pending {
-            background: rgba(255, 221, 87, 0.1);
-            color: var(--warning);
-        }
-
-        .payment-actions button {
-            background: transparent;
+        .record-delete {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(255, 0, 0, 0.3);
+            color: white;
             border: none;
-            color: var(--danger);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 0.7rem;
         }
 
-        /* Modal */
-        .modal {
+        /* Floating particles */
+        .particles {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
+            z-index: -1;
             pointer-events: none;
-            transition: opacity 0.3s;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--neon-blue);
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: float 15s infinite linear;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            50% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
         }
 
-        .modal.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .modal-content {
-            background: var(--dark);
-            padding: 30px;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 500px;
-            border: 1px solid var(--primary);
-            box-shadow: 0 10px 30px rgba(0, 255, 157, 0.2);
-            transform: translateY(-20px);
-            transition: transform 0.3s;
-        }
-
-        .modal.active .modal-content {
-            transform: translateY(0);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .modal-title {
-            font-size: 1.5rem;
-            color: var(--primary);
-        }
-
-        .close-modal {
-            background: transparent;
-            border: none;
-            color: var(--light);
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-
-        /* Responsive */
+        /* Responsive adjustments */
         @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 15px;
+            .bank-info p {
+                font-size: 0.9rem;
             }
-
-            .auth-buttons {
-                display: flex;
-                gap: 10px;
-            }
-
+            
             .calendar-day {
-                padding: 2px;
+                min-height: 50px;
+                padding: 5px;
+            }
+            
+            .day-number {
                 font-size: 0.8rem;
             }
-
-            .calendar-event {
-                display: none;
+            
+            .client-note {
+                font-size: 0.6rem;
+            }
+            
+            .payment-type {
+                flex-direction: column;
+                gap: 10px;
             }
         }
 
-        /* Animations */
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(0, 255, 157, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(0, 255, 157, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(0, 255, 157, 0); }
+        @media (max-width: 480px) {
+            .bank-info h2 {
+                font-size: 1.2rem;
+            }
+            
+            .bank-info p {
+                font-size: 0.8rem;
+                padding: 6px 0;
+            }
+            
+            .calendar-title {
+                font-size: 1.1rem;
+            }
+            
+            .calendar-nav button {
+                padding: 3px 6px;
+                font-size: 0.8rem;
+            }
+            
+            .weekday {
+                font-size: 0.8rem;
+            }
+            
+            .calendar-day {
+                min-height: 40px;
+            }
         }
 
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-
-        /* Utility Classes */
-        .text-primary {
-            color: var(--primary);
-        }
-
-        .text-secondary {
-            color: var(--secondary);
-        }
-
-        .mb-3 {
-            margin-bottom: 1rem;
-        }
-
-        .mt-3 {
-            margin-top: 1rem;
-        }
-
-        .d-none {
-            display: none;
+        @media (max-width: 350px) {
+            .calendar-grid {
+                gap: 3px;
+            }
+            
+            .calendar-day {
+                padding: 3px;
+                min-height: 35px;
+            }
+            
+            .day-number {
+                margin-bottom: 2px;
+            }
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="container header-content">
-            <div class="logo">
-                <i class="fas fa-calendar-alt"></i>
-                <h1 class="futuristic">NEXUS CALENDAR</h1>
+    <!-- Floating particles -->
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <!-- Sección de información bancaria -->
+        <div class="bank-info">
+            <h2>BANCO PICHINCHA</h2>
+            <p>CUENTA DE AHORROS: 2203838240</p>
+            <p>********************************</p>
+            <p>NOMBRE: MIGUEL FONSECA</p>
+            <p>********************************</p>
+            <p>CÉDULA: 2100657739</p>
+            <p>********************************</p>
+            <p>WHATSAPP: 0980051394</p>
+        </div>
+        
+        <!-- Calendario -->
+        <div class="calendar-container">
+            <div class="calendar-header">
+                <div class="calendar-title" id="calendarTitle">Mes y Año</div>
+                <div class="calendar-nav">
+                    <button id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+                    <button id="today">Hoy</button>
+                    <button id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+                </div>
             </div>
-            <div id="auth-buttons" class="auth-buttons">
-                <button id="login-btn" class="futuristic">INICIAR SESIÓN</button>
-                <button id="register-btn" class="futuristic">REGISTRARSE</button>
+            
+            <div class="calendar-weekdays">
+                <div class="weekday">Dom</div>
+                <div class="weekday">Lun</div>
+                <div class="weekday">Mar</div>
+                <div class="weekday">Mié</div>
+                <div class="weekday">Jue</div>
+                <div class="weekday">Vie</div>
+                <div class="weekday">Sáb</div>
             </div>
-            <div id="user-profile" class="user-profile d-none">
-                <div class="user-avatar" id="user-avatar">U</div>
-                <button id="logout-btn" class="futuristic">CERRAR SESIÓN</button>
+            
+            <div class="calendar-grid" id="calendarGrid">
+                <!-- Los días del calendario se generarán con JavaScript -->
             </div>
         </div>
-    </header>
-
-    <main class="container">
-        <div class="main-grid">
-            <aside class="sidebar">
-                <div class="sidebar-section">
-                    <h2 class="sidebar-title"><i class="fas fa-user-circle"></i> PERFIL</h2>
-                    <div id="user-info">
-                        <p>Inicia sesión para ver tu perfil</p>
-                    </div>
-                </div>
-
-                <div class="sidebar-section">
-                    <h2 class="sidebar-title"><i class="fas fa-wallet"></i> PAGOS</h2>
-                    <div id="payment-summary">
-                        <p>Inicia sesión para ver tus pagos</p>
-                    </div>
-                </div>
-
-                <div class="sidebar-section">
-                    <h2 class="sidebar-title"><i class="fas fa-bell"></i> NOTIFICACIONES</h2>
-                    <div id="notifications">
-                        <p>No hay notificaciones</p>
-                    </div>
-                </div>
-            </aside>
-
-            <div class="main-content">
-                <section class="calendar-container">
-                    <div class="calendar-header">
-                        <h2 class="calendar-title futuristic" id="current-month">ENERO 2023</h2>
-                        <div class="calendar-nav">
-                            <button id="prev-month"><i class="fas fa-chevron-left"></i></button>
-                            <button id="next-month"><i class="fas fa-chevron-right"></i></button>
-                        </div>
-                    </div>
-                    <div class="calendar-grid" id="calendar-days-header">
-                        <div class="calendar-day-header">DOM</div>
-                        <div class="calendar-day-header">LUN</div>
-                        <div class="calendar-day-header">MAR</div>
-                        <div class="calendar-day-header">MIÉ</div>
-                        <div class="calendar-day-header">JUE</div>
-                        <div class="calendar-day-header">VIÉ</div>
-                        <div class="calendar-day-header">SÁB</div>
-                    </div>
-                    <div class="calendar-grid" id="calendar-days"></div>
-                </section>
-
-                <section class="payment-form d-none" id="payment-form-section">
-                    <h2 class="form-title futuristic">REGISTRAR PAGO</h2>
-                    <form id="payment-form">
-                        <div class="form-group">
-                            <label for="payment-type">Tipo de Pago</label>
-                            <select id="payment-type" class="form-control" required>
-                                <option value="">Selecciona un tipo</option>
-                                <option value="inscription">Inscripción</option>
-                                <option value="monthly">Mensualidad</option>
-                                <option value="other">Otro</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="payment-amount">Monto ($)</label>
-                            <input type="number" id="payment-amount" class="form-control" required min="1">
-                        </div>
-                        <div class="form-group">
-                            <label for="payment-date">Fecha Seleccionada</label>
-                            <input type="text" id="payment-date" class="form-control" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label for="payment-notes">Notas</label>
-                            <textarea id="payment-notes" class="form-control" rows="3"></textarea>
-                        </div>
-                        <button type="submit" class="btn futuristic">REGISTRAR PAGO</button>
-                    </form>
-                </section>
-
-                <section class="payments-list d-none" id="payments-section">
-                    <h2 class="form-title futuristic">TUS PAGOS</h2>
-                    <div id="payments-container">
-                        <p>No hay pagos registrados</p>
-                    </div>
-                </section>
-
-                <section class="comments-section d-none" id="comments-section">
-                    <h2 class="form-title futuristic">COMENTARIOS</h2>
-                    <form id="comment-form">
-                        <div class="form-group">
-                            <label for="comment-text">Añadir Comentario</label>
-                            <textarea id="comment-text" class="form-control" rows="3" required></textarea>
-                        </div>
-                        <button type="submit" class="btn futuristic">PUBLICAR</button>
-                    </form>
-                    <div class="comments-list" id="comments-list">
-                        <p>No hay comentarios</p>
-                    </div>
-                </section>
+        
+        <!-- Panel de edición de notas -->
+        <div class="edit-panel">
+            <h3>Registro de Pagos - <span id="selectedDateText">Seleccione una fecha</span></h3>
+            
+            <div class="payment-type">
+                <button id="inscriptionBtn" class="active">Pago de Inscripción</button>
+                <button id="monthlyBtn">Pago de Mensualidad</button>
             </div>
+            
+            <textarea id="clientNotes" placeholder="Registre aquí los detalles del pago..."></textarea>
+            <button id="saveNotes">Guardar Pago</button>
         </div>
-    </main>
-
-    <!-- Modals -->
-    <div class="modal" id="login-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title futuristic">INICIAR SESIÓN</h3>
-                <button class="close-modal">&times;</button>
+        
+        <!-- Registros de pagos -->
+        <div class="records-container">
+            <div class="records-column">
+                <h3><i class="fas fa-user-plus"></i> Pagos de Inscripción</h3>
+                <div class="records-list" id="inscriptionRecords">
+                    <!-- Registros se generarán con JavaScript -->
+                </div>
             </div>
-            <form id="login-form">
-                <div class="form-group">
-                    <label for="login-email">Correo Electrónico</label>
-                    <input type="email" id="login-email" class="form-control" required>
+            
+            <div class="records-column">
+                <h3><i class="fas fa-calendar-alt"></i> Pagos de Mensualidad</h3>
+                <div class="records-list" id="monthlyRecords">
+                    <!-- Registros se generarán con JavaScript -->
                 </div>
-                <div class="form-group">
-                    <label for="login-password">Contraseña</label>
-                    <input type="password" id="login-password" class="form-control" required>
-                </div>
-                <button type="submit" class="btn futuristic">INGRESAR</button>
-            </form>
+            </div>
         </div>
     </div>
 
-    <div class="modal" id="register-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title futuristic">REGISTRARSE</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <form id="register-form">
-                <div class="form-group">
-                    <label for="register-name">Nombre Completo</label>
-                    <input type="text" id="register-name" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="register-email">Correo Electrónico</label>
-                    <input type="email" id="register-email" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="register-password">Contraseña</label>
-                    <input type="password" id="register-password" class="form-control" required minlength="6">
-                </div>
-                <div class="form-group">
-                    <label for="register-confirm">Confirmar Contraseña</label>
-                    <input type="password" id="register-confirm" class="form-control" required minlength="6">
-                </div>
-                <button type="submit" class="btn futuristic">CREAR CUENTA</button>
-            </form>
-        </div>
-    </div>
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
     <script>
-        // Initialize Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyD3MI1klgBSHs1h6QT4VPNoScCfCwMV_Ck",
-            authDomain: "usuario-b0384.firebaseapp.com",
-            databaseURL: "https://usuario-b0384-default-rtdb.firebaseio.com",
-            projectId: "usuario-b0384",
-            storageBucket: "usuario-b0384.firebasestorage.app",
-            messagingSenderId: "196266170863",
-            appId: "1:196266170863:web:4ea57f489df94aba94fe1a"
-        };
+        // Crear partículas flotantes
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                particle.style.width = `${Math.random() * 3 + 1}px`;
+                particle.style.height = particle.style.width;
+                particle.style.animationDelay = `${Math.random() * 15}s`;
+                particle.style.animationDuration = `${Math.random() * 10 + 10}s`;
+                particlesContainer.appendChild(particle);
+            }
+        }
 
-        const app = firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
-        // DOM Elements
-        const authButtons = document.getElementById('auth-buttons');
-        const userProfile = document.getElementById('user-profile');
-        const userAvatar = document.getElementById('user-avatar');
-        const logoutBtn = document.getElementById('logout-btn');
-        const loginBtn = document.getElementById('login-btn');
-        const registerBtn = document.getElementById('register-btn');
-        const loginModal = document.getElementById('login-modal');
-        const registerModal = document.getElementById('register-modal');
-        const closeModals = document.querySelectorAll('.close-modal');
-        const loginForm = document.getElementById('login-form');
-        const registerForm = document.getElementById('register-form');
-        const currentMonthEl = document.getElementById('current-month');
-        const calendarDays = document.getElementById('calendar-days');
-        const prevMonthBtn = document.getElementById('prev-month');
-        const nextMonthBtn = document.getElementById('next-month');
-        const paymentFormSection = document.getElementById('payment-form-section');
-        const paymentForm = document.getElementById('payment-form');
-        const paymentDateInput = document.getElementById('payment-date');
-        const paymentsSection = document.getElementById('payments-section');
-        const paymentsContainer = document.getElementById('payments-container');
-        const commentsSection = document.getElementById('comments-section');
-        const commentForm = document.getElementById('comment-form');
-        const commentsList = document.getElementById('comments-list');
-        const userInfo = document.getElementById('user-info');
-
-        // Calendar Variables
+        // Variables del calendario
         let currentDate = new Date();
         let selectedDate = null;
+        let selectedWeek = null;
+        let paymentType = 'inscription'; // 'inscription' o 'monthly'
+        let paymentRecords = JSON.parse(localStorage.getItem('paymentRecords')) || {
+            inscription: [],
+            monthly: []
+        };
 
-        // Auth State Listener
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                // User is signed in
-                authButtons.classList.add('d-none');
-                userProfile.classList.remove('d-none');
-                userAvatar.textContent = user.email.charAt(0).toUpperCase();
-                
-                // Show protected sections
-                paymentFormSection.classList.remove('d-none');
-                paymentsSection.classList.remove('d-none');
-                commentsSection.classList.remove('d-none');
-                
-                // Load user data
-                loadUserData(user.uid);
-                loadPayments(user.uid);
-                loadComments();
-            } else {
-                // User is signed out
-                authButtons.classList.remove('d-none');
-                userProfile.classList.add('d-none');
-                
-                // Hide protected sections
-                paymentFormSection.classList.add('d-none');
-                paymentsSection.classList.add('d-none');
-                commentsSection.classList.add('d-none');
-            }
-        });
-
-        // Modal Controls
-        loginBtn.addEventListener('click', () => {
-            loginModal.classList.add('active');
-        });
-
-        registerBtn.addEventListener('click', () => {
-            registerModal.classList.add('active');
-        });
-
-        closeModals.forEach(btn => {
-            btn.addEventListener('click', () => {
-                loginModal.classList.remove('active');
-                registerModal.classList.remove('active');
+        // Inicializar el calendario
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            renderCalendar();
+            setupEventListeners();
+            renderPaymentRecords();
+            
+            // Configurar botones de tipo de pago
+            document.getElementById('inscriptionBtn').addEventListener('click', function() {
+                paymentType = 'inscription';
+                this.classList.add('active');
+                document.getElementById('monthlyBtn').classList.remove('active');
+            });
+            
+            document.getElementById('monthlyBtn').addEventListener('click', function() {
+                paymentType = 'monthly';
+                this.classList.add('active');
+                document.getElementById('inscriptionBtn').classList.remove('active');
             });
         });
 
-        window.addEventListener('click', (e) => {
-            if (e.target === loginModal) {
-                loginModal.classList.remove('active');
-            }
-            if (e.target === registerModal) {
-                registerModal.classList.remove('active');
-            }
-        });
-
-        // Auth Forms
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = loginForm['login-email'].value;
-            const password = loginForm['login-password'].value;
-            
-            auth.signInWithEmailAndPassword(email, password)
-                .then(() => {
-                    loginModal.classList.remove('active');
-                    loginForm.reset();
-                })
-                .catch(error => {
-                    alert(error.message);
-                });
-        });
-
-        registerForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const name = registerForm['register-name'].value;
-            const email = registerForm['register-email'].value;
-            const password = registerForm['register-password'].value;
-            const confirmPassword = registerForm['register-confirm'].value;
-            
-            if (password !== confirmPassword) {
-                alert('Las contraseñas no coinciden');
-                return;
-            }
-            
-            auth.createUserWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    // Create user document in Firestore
-                    return db.collection('users').doc(userCredential.user.uid).set({
-                        name: name,
-                        email: email,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                })
-                .then(() => {
-                    registerModal.classList.remove('active');
-                    registerForm.reset();
-                })
-                .catch(error => {
-                    alert(error.message);
-                });
-        });
-
-        logoutBtn.addEventListener('click', () => {
-            auth.signOut();
-        });
-
-        // Calendar Functions
+        // Renderizar el calendario
         function renderCalendar() {
+            const calendarTitle = document.getElementById('calendarTitle');
+            const calendarGrid = document.getElementById('calendarGrid');
+            
+            // Configurar título del mes y año
+            const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", 
+                               "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            calendarTitle.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+            
+            // Limpiar el grid
+            calendarGrid.innerHTML = '';
+            
+            // Obtener primer día del mes y último día del mes
             const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
             const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
-            const prevLastDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0);
             
-            const firstDayIndex = firstDay.getDay();
-            const lastDayIndex = lastDay.getDay();
-            const nextDays = 7 - lastDayIndex - 1;
+            // Días de la semana del primer día (0-6, donde 0 es domingo)
+            const startDay = firstDay.getDay();
             
-            const months = [
-                "ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO",
-                "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"
-            ];
+            // Días del mes anterior que se muestran
+            const prevMonthLastDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0).getDate();
             
-            currentMonthEl.textContent = `${months[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
-            
-            let days = "";
-            
-            // Previous month days
-            for (let x = firstDayIndex; x > 0; x--) {
-                const day = prevLastDay.getDate() - x + 1;
-                days += `<div class="calendar-day other-month">${day}</div>`;
+            // Crear días del mes anterior
+            for (let i = startDay - 1; i >= 0; i--) {
+                const dayElement = createDayElement(prevMonthLastDay - i, true);
+                calendarGrid.appendChild(dayElement);
             }
             
-            // Current month days
+            // Crear días del mes actual
             for (let i = 1; i <= lastDay.getDate(); i++) {
                 const dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), i);
-                const isToday = dayDate.toDateString() === new Date().toDateString();
-                const isSelected = selectedDate && dayDate.toDateString() === selectedDate.toDateString();
+                const dayElement = createDayElement(i, false, dayDate);
                 
-                days += `<div class="calendar-day ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''}" data-date="${dayDate.toISOString()}">
-                    <div class="calendar-day-number">${i}</div>
-                </div>`;
+                // Marcar el día actual
+                const today = new Date();
+                if (dayDate.toDateString() === today.toDateString()) {
+                    dayElement.classList.add('today');
+                }
+                
+                // Marcar semana seleccionada
+                if (selectedWeek && isDateInWeek(dayDate, selectedWeek)) {
+                    dayElement.classList.add('selected-week');
+                }
+                
+                calendarGrid.appendChild(dayElement);
             }
             
-            // Next month days
-            for (let j = 1; j <= nextDays; j++) {
-                days += `<div class="calendar-day other-month">${j}</div>`;
+            // Calcular días restantes para completar la última semana
+            const remainingDays = 42 - (startDay + lastDay.getDate());
+            for (let i = 1; i <= remainingDays; i++) {
+                const dayElement = createDayElement(i, true);
+                calendarGrid.appendChild(dayElement);
+            }
+        }
+
+        // Crear elemento de día
+        function createDayElement(day, isOtherMonth, date = null) {
+            const dayElement = document.createElement('div');
+            dayElement.classList.add('calendar-day');
+            if (isOtherMonth) {
+                dayElement.style.opacity = '0.5';
             }
             
-            calendarDays.innerHTML = days;
+            dayElement.innerHTML = `<div class="day-number">${day}</div>`;
             
-            // Add event listeners to days
-            document.querySelectorAll('.calendar-day:not(.other-month)').forEach(day => {
-                day.addEventListener('click', () => {
-                    selectedDate = new Date(day.dataset.date);
-                    renderCalendar();
-                    
-                    // Update payment form with selected date
-                    if (auth.currentUser) {
-                        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                        paymentDateInput.value = selectedDate.toLocaleDateString('es-ES', options);
-                    }
+            if (date) {
+                const dateKey = formatDateKey(date);
+                dayElement.dataset.date = dateKey;
+                
+                // Mostrar notas existentes
+                const inscriptionNotes = paymentRecords.inscription.filter(note => note.date === dateKey);
+                const monthlyNotes = paymentRecords.monthly.filter(note => note.date === dateKey);
+                
+                inscriptionNotes.forEach(note => {
+                    const notePreview = document.createElement('div');
+                    notePreview.classList.add('client-note', 'inscription-note');
+                    notePreview.textContent = `Inscripción: ${note.content.substring(0, 10)}...`;
+                    dayElement.appendChild(notePreview);
                 });
+                
+                monthlyNotes.forEach(note => {
+                    const notePreview = document.createElement('div');
+                    notePreview.classList.add('client-note', 'monthly-note');
+                    notePreview.textContent = `Mensualidad: ${note.content.substring(0, 10)}...`;
+                    dayElement.appendChild(notePreview);
+                });
+                
+                // Evento click para seleccionar día
+                dayElement.addEventListener('click', function() {
+                    selectDate(date);
+                });
+                
+                // Evento doble click para seleccionar semana
+                dayElement.addEventListener('dblclick', function() {
+                    selectWeek(date);
+                });
+            }
+            
+            return dayElement;
+        }
+
+        // Seleccionar fecha
+        function selectDate(date) {
+            selectedDate = date;
+            selectedWeek = null;
+            
+            // Actualizar interfaz
+            updateSelectedDateText();
+            document.getElementById('clientNotes').value = '';
+            renderCalendar();
+        }
+
+        // Seleccionar semana
+        function selectWeek(date) {
+            selectedWeek = getWeekDates(date);
+            selectedDate = null;
+            
+            // Actualizar interfaz
+            document.getElementById('selectedDateText').textContent = `Semana del ${formatDate(selectedWeek[0])} al ${formatDate(selectedWeek[6])}`;
+            document.getElementById('clientNotes').value = '';
+            renderCalendar();
+        }
+
+        // Obtener todas las fechas de la semana de una fecha dada
+        function getWeekDates(date) {
+            const day = date.getDay();
+            const startDate = new Date(date);
+            startDate.setDate(date.getDate() - day);
+            
+            const weekDates = [];
+            for (let i = 0; i < 7; i++) {
+                const newDate = new Date(startDate);
+                newDate.setDate(startDate.getDate() + i);
+                weekDates.push(newDate);
+            }
+            
+            return weekDates;
+        }
+
+        // Verificar si una fecha está en la semana seleccionada
+        function isDateInWeek(date, week) {
+            return week.some(weekDate => 
+                date.getFullYear() === weekDate.getFullYear() &&
+                date.getMonth() === weekDate.getMonth() &&
+                date.getDate() === weekDate.getDate()
+            );
+        }
+
+        // Actualizar texto de fecha seleccionada
+        function updateSelectedDateText() {
+            if (selectedDate) {
+                document.getElementById('selectedDateText').textContent = formatDate(selectedDate);
+            }
+        }
+
+        // Formatear fecha como clave (YYYY-MM-DD)
+        function formatDateKey(date) {
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        }
+
+        // Formatear fecha para mostrar (DD/MM/YYYY)
+        function formatDate(date) {
+            return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
+        }
+
+        // Configurar event listeners
+        function setupEventListeners() {
+            // Navegación del calendario
+            document.getElementById('prevMonth').addEventListener('click', function() {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                renderCalendar();
+            });
+            
+            document.getElementById('nextMonth').addEventListener('click', function() {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                renderCalendar();
+            });
+            
+            document.getElementById('today').addEventListener('click', function() {
+                currentDate = new Date();
+                renderCalendar();
+            });
+            
+            // Guardar notas
+            document.getElementById('saveNotes').addEventListener('click', function() {
+                const noteText = document.getElementById('clientNotes').value.trim();
+                
+                if (!noteText) {
+                    alert('Por favor ingrese los detalles del pago');
+                    return;
+                }
+                
+                if (selectedDate) {
+                    addPaymentRecord(selectedDate, noteText);
+                } else if (selectedWeek) {
+                    selectedWeek.forEach(date => {
+                        addPaymentRecord(date, noteText);
+                    });
+                } else {
+                    alert('Por favor seleccione una fecha o semana');
+                }
             });
         }
 
-        prevMonthBtn.addEventListener('click', () => {
-            currentDate.setMonth(currentDate.getMonth() - 1);
-            renderCalendar();
-        });
-
-        nextMonthBtn.addEventListener('click', () => {
-            currentDate.setMonth(currentDate.getMonth() + 1);
-            renderCalendar();
-        });
-
-        // Payment Functions
-        paymentForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            if (!selectedDate) {
-                alert('Por favor selecciona una fecha en el calendario');
-                return;
-            }
-            
-            const type = paymentForm['payment-type'].value;
-            const amount = parseFloat(paymentForm['payment-amount'].value);
-            const notes = paymentForm['payment-notes'].value;
-            const userId = auth.currentUser.uid;
-            
-            db.collection('payments').add({
-                userId: userId,
-                type: type,
-                amount: amount,
-                date: selectedDate,
-                notes: notes,
-                status: 'paid',
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            })
-            .then(() => {
-                paymentForm.reset();
-                loadPayments(userId);
-            })
-            .catch(error => {
-                alert('Error al registrar el pago: ' + error.message);
-            });
-        });
-
-        function loadPayments(userId) {
-            paymentsContainer.innerHTML = '<p>Cargando pagos...</p>';
-            
-            db.collection('payments')
-                .where('userId', '==', userId)
-                .orderBy('date', 'desc')
-                .get()
-                .then(querySnapshot => {
-                    if (querySnapshot.empty) {
-                        paymentsContainer.innerHTML = '<p>No hay pagos registrados</p>';
-                        return;
-                    }
-                    
-                    let paymentsHtml = '';
-                    querySnapshot.forEach(doc => {
-                        const payment = doc.data();
-                        const date = payment.date.toDate();
-                        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                        
-                        paymentsHtml += `
-                            <div class="payment-item" data-id="${doc.id}">
-                                <div class="payment-info">
-                                    <h4>${getPaymentTypeName(payment.type)}</h4>
-                                    <div class="payment-details">
-                                        <span class="payment-amount">$${payment.amount.toFixed(2)}</span>
-                                        <span class="payment-date">${date.toLocaleDateString('es-ES', options)}</span>
-                                        <span class="payment-status status-${payment.status}">${payment.status === 'paid' ? 'PAGADO' : 'PENDIENTE'}</span>
-                                    </div>
-                                    ${payment.notes ? `<p>${payment.notes}</p>` : ''}
-                                </div>
-                                <div class="payment-actions">
-                                    <button class="delete-payment" title="Eliminar pago"><i class="fas fa-trash"></i></button>
-                                </div>
-                            </div>
-                        `;
-                    });
-                    
-                    paymentsContainer.innerHTML = paymentsHtml;
-                    
-                    // Add event listeners to delete buttons
-                    document.querySelectorAll('.delete-payment').forEach(btn => {
-                        btn.addEventListener('click', (e) => {
-                            const paymentId = e.target.closest('.payment-item').dataset.id;
-                            if (confirm('¿Estás seguro de eliminar este pago?')) {
-                                db.collection('payments').doc(paymentId).delete()
-                                    .then(() => {
-                                        loadPayments(userId);
-                                    })
-                                    .catch(error => {
-                                        alert('Error al eliminar el pago: ' + error.message);
-                                    });
-                            }
-                        });
-                    });
-                })
-                .catch(error => {
-                    paymentsContainer.innerHTML = '<p>Error al cargar los pagos</p>';
-                    console.error('Error loading payments:', error);
-                });
-        }
-
-        function getPaymentTypeName(type) {
-            const types = {
-                'inscription': 'Inscripción',
-                'monthly': 'Mensualidad',
-                'other': 'Otro pago'
+        // Añadir registro de pago
+        function addPaymentRecord(date, content) {
+            const dateKey = formatDateKey(date);
+            const record = {
+                id: Date.now().toString(),
+                date: dateKey,
+                content: content,
+                timestamp: new Date().toISOString()
             };
-            return types[type] || type;
-        }
-
-        // Comment Functions
-        commentForm.addEventListener('submit', (e) => {
-            e.preventDefault();
             
-            if (!selectedDate) {
-                alert('Por favor selecciona una fecha en el calendario');
-                return;
+            if (paymentType === 'inscription') {
+                paymentRecords.inscription.push(record);
+            } else {
+                paymentRecords.monthly.push(record);
             }
             
-            const text = commentForm['comment-text'].value;
-            const userId = auth.currentUser.uid;
-            const userEmail = auth.currentUser.email;
+            localStorage.setItem('paymentRecords', JSON.stringify(paymentRecords));
+            renderCalendar();
+            renderPaymentRecords();
+            document.getElementById('clientNotes').value = '';
+        }
+
+        // Renderizar registros de pagos
+        function renderPaymentRecords() {
+            const inscriptionRecords = document.getElementById('inscriptionRecords');
+            const monthlyRecords = document.getElementById('monthlyRecords');
             
-            db.collection('comments').add({
-                userId: userId,
-                userEmail: userEmail,
-                text: text,
-                date: selectedDate,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            })
-            .then(() => {
-                commentForm.reset();
-                loadComments();
-            })
-            .catch(error => {
-                alert('Error al publicar el comentario: ' + error.message);
+            // Ordenar registros por fecha (más recientes primero)
+            const sortedInscription = [...paymentRecords.inscription].sort((a, b) => 
+                new Date(b.timestamp) - new Date(a.timestamp));
+            const sortedMonthly = [...paymentRecords.monthly].sort((a, b) => 
+                new Date(b.timestamp) - new Date(a.timestamp));
+            
+            // Renderizar inscripciones
+            inscriptionRecords.innerHTML = '';
+            sortedInscription.forEach(record => {
+                const recordElement = createRecordElement(record, 'inscription');
+                inscriptionRecords.appendChild(recordElement);
             });
-        });
-
-        function loadComments() {
-            commentsList.innerHTML = '<p>Cargando comentarios...</p>';
             
-            db.collection('comments')
-                .orderBy('createdAt', 'desc')
-                .limit(20)
-                .get()
-                .then(querySnapshot => {
-                    if (querySnapshot.empty) {
-                        commentsList.innerHTML = '<p>No hay comentarios</p>';
-                        return;
-                    }
-                    
-                    let commentsHtml = '';
-                    querySnapshot.forEach(doc => {
-                        const comment = doc.data();
-                        const date = comment.date.toDate();
-                        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                        
-                        commentsHtml += `
-                            <div class="comment">
-                                <div class="comment-header">
-                                    <span class="comment-user">${comment.userEmail}</span>
-                                    <span class="comment-date">${date.toLocaleDateString('es-ES', options)}</span>
-                                </div>
-                                <div class="comment-content">
-                                    <p>${comment.text}</p>
-                                </div>
-                            </div>
-                        `;
-                    });
-                    
-                    commentsList.innerHTML = commentsHtml;
-                })
-                .catch(error => {
-                    commentsList.innerHTML = '<p>Error al cargar los comentarios</p>';
-                    console.error('Error loading comments:', error);
-                });
+            // Renderizar mensualidades
+            monthlyRecords.innerHTML = '';
+            sortedMonthly.forEach(record => {
+                const recordElement = createRecordElement(record, 'monthly');
+                monthlyRecords.appendChild(recordElement);
+            });
         }
 
-        // User Data Functions
-        function loadUserData(userId) {
-            db.collection('users').doc(userId).get()
-                .then(doc => {
-                    if (doc.exists) {
-                        const userData = doc.data();
-                        userInfo.innerHTML = `
-                            <p><strong>Nombre:</strong> ${userData.name}</p>
-                            <p><strong>Email:</strong> ${userData.email}</p>
-                            <p><strong>Miembro desde:</strong> ${userData.createdAt.toDate().toLocaleDateString()}</p>
-                        `;
-                    }
-                })
-                .catch(error => {
-                    console.error('Error loading user data:', error);
-                });
+        // Crear elemento de registro
+        function createRecordElement(record, type) {
+            const recordElement = document.createElement('div');
+            recordElement.classList.add('record-item', type);
+            recordElement.dataset.id = record.id;
+            
+            const date = new Date(record.timestamp);
+            const formattedDate = formatDate(date);
+            
+            recordElement.innerHTML = `
+                <div class="record-date">${formattedDate}</div>
+                <div class="record-content">${record.content}</div>
+                <button class="record-delete" onclick="deletePaymentRecord('${record.id}', '${type}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            `;
+            
+            return recordElement;
         }
 
-        // Initialize Calendar
-        renderCalendar();
+        // Eliminar registro de pago
+        function deletePaymentRecord(id, type) {
+            if (confirm('¿Está seguro que desea eliminar este registro?')) {
+                if (type === 'inscription') {
+                    paymentRecords.inscription = paymentRecords.inscription.filter(record => record.id !== id);
+                } else {
+                    paymentRecords.monthly = paymentRecords.monthly.filter(record => record.id !== id);
+                }
+                
+                localStorage.setItem('paymentRecords', JSON.stringify(paymentRecords));
+                renderCalendar();
+                renderPaymentRecords();
+            }
+        }
     </script>
 </body>
 </html>
