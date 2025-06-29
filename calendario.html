@@ -11,6 +11,8 @@
             --dark-bg: #0a0a1a;
             --card-bg: rgba(15, 15, 35, 0.8);
             --text-color: #e0e0ff;
+            --inscription-color: #00ff88;
+            --monthly-color: #ff00e4;
         }
         
         body {
@@ -29,6 +31,13 @@
             max-width: 100%;
             padding: 15px;
             box-sizing: border-box;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                max-width: 800px;
+            }
         }
 
         /* Estilo para la sección de información bancaria */
@@ -69,6 +78,7 @@
             padding: 8px 0;
             border-bottom: 1px dashed rgba(0, 247, 255, 0.3);
             font-size: 1rem;
+            text-align: center;
         }
 
         .bank-info p:last-child {
@@ -170,14 +180,22 @@
 
         .client-note {
             font-size: 0.7rem;
-            background: rgba(0, 255, 0, 0.1);
-            border-left: 2px solid #00ff00;
             padding: 2px 5px;
             margin-top: 3px;
             border-radius: 2px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        .inscription-note {
+            background: rgba(0, 255, 136, 0.1);
+            border-left: 2px solid var(--inscription-color);
+        }
+
+        .monthly-note {
+            background: rgba(255, 0, 228, 0.1);
+            border-left: 2px solid var(--monthly-color);
         }
 
         /* Panel de edición */
@@ -187,12 +205,53 @@
             padding: 15px;
             border: 1px solid rgba(0, 247, 255, 0.2);
             box-shadow: 0 0 15px rgba(0, 247, 255, 0.1);
+            margin-bottom: 20px;
         }
 
         .edit-panel h3 {
             color: var(--neon-blue);
             margin-top: 0;
             font-size: 1.2rem;
+        }
+
+        .payment-type {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 15px;
+        }
+
+        .payment-type button {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .payment-type button.active {
+            box-shadow: 0 0 10px;
+        }
+
+        #inscriptionBtn {
+            border-color: var(--inscription-color);
+            color: var(--inscription-color);
+        }
+
+        #inscriptionBtn.active {
+            background: rgba(0, 255, 136, 0.2);
+            box-shadow: 0 0 10px var(--inscription-color);
+        }
+
+        #monthlyBtn {
+            border-color: var(--monthly-color);
+            color: var(--monthly-color);
+        }
+
+        #monthlyBtn.active {
+            background: rgba(255, 0, 228, 0.2);
+            box-shadow: 0 0 10px var(--monthly-color);
         }
 
         .edit-panel textarea {
@@ -220,6 +279,83 @@
 
         .edit-panel button:hover {
             box-shadow: 0 0 15px var(--neon-blue);
+        }
+
+        /* Registros de pagos */
+        .records-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        @media (min-width: 600px) {
+            .records-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .records-column {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid rgba(0, 247, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 247, 255, 0.1);
+        }
+
+        .records-column h3 {
+            color: var(--neon-blue);
+            margin-top: 0;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        .records-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .record-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .record-item.inscription {
+            border-left: 3px solid var(--inscription-color);
+        }
+
+        .record-item.monthly {
+            border-left: 3px solid var(--monthly-color);
+        }
+
+        .record-date {
+            font-weight: bold;
+            color: var(--neon-blue);
+            margin-bottom: 5px;
+        }
+
+        .record-content {
+            font-size: 0.9rem;
+        }
+
+        .record-delete {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(255, 0, 0, 0.3);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.7rem;
         }
 
         /* Floating particles */
@@ -274,6 +410,11 @@
             
             .client-note {
                 font-size: 0.6rem;
+            }
+            
+            .payment-type {
+                flex-direction: column;
+                gap: 10px;
             }
         }
 
@@ -367,8 +508,31 @@
         <!-- Panel de edición de notas -->
         <div class="edit-panel">
             <h3>Registro de Pagos - <span id="selectedDateText">Seleccione una fecha</span></h3>
-            <textarea id="clientNotes" placeholder="Registre aquí los pagos de los clientes para esta fecha..."></textarea>
-            <button id="saveNotes">Guardar Notas</button>
+            
+            <div class="payment-type">
+                <button id="inscriptionBtn" class="active">Pago de Inscripción</button>
+                <button id="monthlyBtn">Pago de Mensualidad</button>
+            </div>
+            
+            <textarea id="clientNotes" placeholder="Registre aquí los detalles del pago..."></textarea>
+            <button id="saveNotes">Guardar Pago</button>
+        </div>
+        
+        <!-- Registros de pagos -->
+        <div class="records-container">
+            <div class="records-column">
+                <h3><i class="fas fa-user-plus"></i> Pagos de Inscripción</h3>
+                <div class="records-list" id="inscriptionRecords">
+                    <!-- Registros se generarán con JavaScript -->
+                </div>
+            </div>
+            
+            <div class="records-column">
+                <h3><i class="fas fa-calendar-alt"></i> Pagos de Mensualidad</h3>
+                <div class="records-list" id="monthlyRecords">
+                    <!-- Registros se generarán con JavaScript -->
+                </div>
+            </div>
         </div>
     </div>
 
@@ -396,19 +560,31 @@
         let currentDate = new Date();
         let selectedDate = null;
         let selectedWeek = null;
-        let notes = JSON.parse(localStorage.getItem('clientNotes')) || {};
+        let paymentType = 'inscription'; // 'inscription' o 'monthly'
+        let paymentRecords = JSON.parse(localStorage.getItem('paymentRecords')) || {
+            inscription: [],
+            monthly: []
+        };
 
         // Inicializar el calendario
         document.addEventListener('DOMContentLoaded', function() {
             createParticles();
             renderCalendar();
             setupEventListeners();
+            renderPaymentRecords();
             
-            // Verificar si hay notas guardadas para hoy
-            const todayKey = formatDateKey(new Date());
-            if (notes[todayKey]) {
-                document.getElementById('clientNotes').value = notes[todayKey];
-            }
+            // Configurar botones de tipo de pago
+            document.getElementById('inscriptionBtn').addEventListener('click', function() {
+                paymentType = 'inscription';
+                this.classList.add('active');
+                document.getElementById('monthlyBtn').classList.remove('active');
+            });
+            
+            document.getElementById('monthlyBtn').addEventListener('click', function() {
+                paymentType = 'monthly';
+                this.classList.add('active');
+                document.getElementById('inscriptionBtn').classList.remove('active');
+            });
         });
 
         // Renderizar el calendario
@@ -482,12 +658,22 @@
                 dayElement.dataset.date = dateKey;
                 
                 // Mostrar notas existentes
-                if (notes[dateKey]) {
+                const inscriptionNotes = paymentRecords.inscription.filter(note => note.date === dateKey);
+                const monthlyNotes = paymentRecords.monthly.filter(note => note.date === dateKey);
+                
+                inscriptionNotes.forEach(note => {
                     const notePreview = document.createElement('div');
-                    notePreview.classList.add('client-note');
-                    notePreview.textContent = notes[dateKey].substring(0, 15) + (notes[dateKey].length > 15 ? '...' : '');
+                    notePreview.classList.add('client-note', 'inscription-note');
+                    notePreview.textContent = `Inscripción: ${note.content.substring(0, 10)}...`;
                     dayElement.appendChild(notePreview);
-                }
+                });
+                
+                monthlyNotes.forEach(note => {
+                    const notePreview = document.createElement('div');
+                    notePreview.classList.add('client-note', 'monthly-note');
+                    notePreview.textContent = `Mensualidad: ${note.content.substring(0, 10)}...`;
+                    dayElement.appendChild(notePreview);
+                });
                 
                 // Evento click para seleccionar día
                 dayElement.addEventListener('click', function() {
@@ -510,7 +696,7 @@
             
             // Actualizar interfaz
             updateSelectedDateText();
-            loadNotesForDate();
+            document.getElementById('clientNotes').value = '';
             renderCalendar();
         }
 
@@ -557,14 +743,6 @@
             }
         }
 
-        // Cargar notas para la fecha seleccionada
-        function loadNotesForDate() {
-            if (selectedDate) {
-                const dateKey = formatDateKey(selectedDate);
-                document.getElementById('clientNotes').value = notes[dateKey] || '';
-            }
-        }
-
         // Formatear fecha como clave (YYYY-MM-DD)
         function formatDateKey(date) {
             return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
@@ -595,32 +773,106 @@
             
             // Guardar notas
             document.getElementById('saveNotes').addEventListener('click', function() {
+                const noteText = document.getElementById('clientNotes').value.trim();
+                
+                if (!noteText) {
+                    alert('Por favor ingrese los detalles del pago');
+                    return;
+                }
+                
                 if (selectedDate) {
-                    const dateKey = formatDateKey(selectedDate);
-                    const noteText = document.getElementById('clientNotes').value.trim();
-                    
-                    if (noteText) {
-                        notes[dateKey] = noteText;
-                    } else {
-                        delete notes[dateKey];
-                    }
-                    
-                    localStorage.setItem('clientNotes', JSON.stringify(notes));
-                    renderCalendar();
+                    addPaymentRecord(selectedDate, noteText);
                 } else if (selectedWeek) {
-                    const noteText = document.getElementById('clientNotes').value.trim();
-                    
-                    if (noteText) {
-                        selectedWeek.forEach(date => {
-                            const dateKey = formatDateKey(date);
-                            notes[dateKey] = noteText;
-                        });
-                        
-                        localStorage.setItem('clientNotes', JSON.stringify(notes));
-                        renderCalendar();
-                    }
+                    selectedWeek.forEach(date => {
+                        addPaymentRecord(date, noteText);
+                    });
+                } else {
+                    alert('Por favor seleccione una fecha o semana');
                 }
             });
+        }
+
+        // Añadir registro de pago
+        function addPaymentRecord(date, content) {
+            const dateKey = formatDateKey(date);
+            const record = {
+                id: Date.now().toString(),
+                date: dateKey,
+                content: content,
+                timestamp: new Date().toISOString()
+            };
+            
+            if (paymentType === 'inscription') {
+                paymentRecords.inscription.push(record);
+            } else {
+                paymentRecords.monthly.push(record);
+            }
+            
+            localStorage.setItem('paymentRecords', JSON.stringify(paymentRecords));
+            renderCalendar();
+            renderPaymentRecords();
+            document.getElementById('clientNotes').value = '';
+        }
+
+        // Renderizar registros de pagos
+        function renderPaymentRecords() {
+            const inscriptionRecords = document.getElementById('inscriptionRecords');
+            const monthlyRecords = document.getElementById('monthlyRecords');
+            
+            // Ordenar registros por fecha (más recientes primero)
+            const sortedInscription = [...paymentRecords.inscription].sort((a, b) => 
+                new Date(b.timestamp) - new Date(a.timestamp));
+            const sortedMonthly = [...paymentRecords.monthly].sort((a, b) => 
+                new Date(b.timestamp) - new Date(a.timestamp));
+            
+            // Renderizar inscripciones
+            inscriptionRecords.innerHTML = '';
+            sortedInscription.forEach(record => {
+                const recordElement = createRecordElement(record, 'inscription');
+                inscriptionRecords.appendChild(recordElement);
+            });
+            
+            // Renderizar mensualidades
+            monthlyRecords.innerHTML = '';
+            sortedMonthly.forEach(record => {
+                const recordElement = createRecordElement(record, 'monthly');
+                monthlyRecords.appendChild(recordElement);
+            });
+        }
+
+        // Crear elemento de registro
+        function createRecordElement(record, type) {
+            const recordElement = document.createElement('div');
+            recordElement.classList.add('record-item', type);
+            recordElement.dataset.id = record.id;
+            
+            const date = new Date(record.timestamp);
+            const formattedDate = formatDate(date);
+            
+            recordElement.innerHTML = `
+                <div class="record-date">${formattedDate}</div>
+                <div class="record-content">${record.content}</div>
+                <button class="record-delete" onclick="deletePaymentRecord('${record.id}', '${type}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            `;
+            
+            return recordElement;
+        }
+
+        // Eliminar registro de pago
+        function deletePaymentRecord(id, type) {
+            if (confirm('¿Está seguro que desea eliminar este registro?')) {
+                if (type === 'inscription') {
+                    paymentRecords.inscription = paymentRecords.inscription.filter(record => record.id !== id);
+                } else {
+                    paymentRecords.monthly = paymentRecords.monthly.filter(record => record.id !== id);
+                }
+                
+                localStorage.setItem('paymentRecords', JSON.stringify(paymentRecords));
+                renderCalendar();
+                renderPaymentRecords();
+            }
         }
     </script>
 </body>
